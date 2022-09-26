@@ -125,6 +125,11 @@ static void light()
 	glLightfv(GL_LIGHT0, GL_SPECULAR, light0_specular);
 	glLightfv(GL_LIGHT0, GL_POSITION, light0_position);
 
+
+	GLfloat spot_direction[] = { 0.0, -1.0, 0.0 };
+	glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, spot_direction);
+	glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 10.0);
+
 	GLfloat light1_ambient[] = { 0.3, 0.3, 0.0, 1.0 };
 	GLfloat light1_diffuse[] = { 1.0, 1.0, 0.0, 1.0 };
 	GLfloat light1_specular[] = { 1.0, 1.0, 0.0, 1.0 };
@@ -146,10 +151,6 @@ static void light()
 	glLightfv(GL_LIGHT2, GL_DIFFUSE, light2_diffuse);
 	glLightfv(GL_LIGHT2, GL_SPECULAR, light2_specular);
 	glLightfv(GL_LIGHT2, GL_POSITION, light2_position);
-
-	//GLfloat spot_direction[] = { 0.0, -1.0, 0.0 };
-	//glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, spot_direction);
-	//glLightf( GL_LIGHT0, GL_SPOT_CUTOFF, 10.0);
 }
 
 void display(void)
@@ -158,8 +159,8 @@ void display(void)
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glFrustum(-5, 5, -5, 5, 4, 50);
-	// gluPerspective(60,1,5,100);
+	//glFrustum(-5, 5, -5, 5, 4, 50);
+	 gluPerspective(60, 1, 5, 100);
 	// glOrtho(-5,5,-5,5, 4, 50);
 
 	glMatrixMode(GL_MODELVIEW);
@@ -268,7 +269,7 @@ int main(int argc, char** argv)
 
 	glEnable(GL_LIGHTING);
 
-	light();
+	//light();
 
 	std::cout << "OpenGL Vendor:   " << glGetString(GL_VENDOR) << std::endl;
 	std::cout << "OpenGL Renderer: " << glGetString(GL_RENDERER) << std::endl;
@@ -277,6 +278,7 @@ int main(int argc, char** argv)
 	glutKeyboardFunc(keyboard_func);
 	glutDisplayFunc(display_func);
 	glutIdleFunc(idle_func);
+	glutSpecialFunc(special_func);
 
 	glutMainLoop();
 
