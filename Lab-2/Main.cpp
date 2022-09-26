@@ -1,5 +1,8 @@
-#include <iostream>
 #include <GL/freeglut_std.h>
+
+#include <iostream>
+
+#include "Assignment.h"
 
 
 constexpr auto WINDOW_WIDTH = 700;
@@ -110,21 +113,43 @@ void drawpyramid(GLfloat r, GLfloat g, GLfloat b)
 
 static void light()
 {
-	GLfloat no_light[] = { 0.0, 0.0, 0.0, 1.0 };
-	GLfloat light_ambient[] = { 0.3, 0.3, 0.3, 1.0 };
-	GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
-	GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-	GLfloat light_position[] = { 0.0, 50.0, 0.0, 1.0 };
+	//GLfloat no_light[] = { 0.0, 0.0, 0.0, 1.0 };
+	GLfloat light0_ambient[] = { 0.3, 0.3, 0.3, 1.0 };
+	GLfloat light0_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
+	GLfloat light0_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+	GLfloat light0_position[] = { 0.0, 50.0, 0.0, 1.0 };
 
 	glEnable(GL_LIGHT0);
-	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
-	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+	glLightfv(GL_LIGHT0, GL_AMBIENT, light0_ambient);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, light0_diffuse);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, light0_specular);
+	glLightfv(GL_LIGHT0, GL_POSITION, light0_position);
 
-	//    GLfloat spot_direction[] = { 0.0, -1.0, 0.0 };
-	//    glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, spot_direction);
-	//    glLightf( GL_LIGHT0, GL_SPOT_CUTOFF, 10.0);
+	GLfloat light1_ambient[] = { 0.3, 0.3, 0.0, 1.0 };
+	GLfloat light1_diffuse[] = { 1.0, 1.0, 0.0, 1.0 };
+	GLfloat light1_specular[] = { 1.0, 1.0, 0.0, 1.0 };
+	GLfloat light1_position[] = { 10.0, 0.0, 0.0, 1.0 };
+
+	glEnable(GL_LIGHT1);
+	glLightfv(GL_LIGHT1, GL_AMBIENT, light1_ambient);
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, light1_diffuse);
+	glLightfv(GL_LIGHT1, GL_SPECULAR, light1_specular);
+	glLightfv(GL_LIGHT1, GL_POSITION, light1_position);
+
+	GLfloat light2_ambient[] = { 0.0, 0.0, 0.3, 1.0 };
+	GLfloat light2_diffuse[] = { 0.0, 0.0, 1.0, 1.0 };
+	GLfloat light2_specular[] = { 0.0, 0.0, 1.0, 1.0 };
+	GLfloat light2_position[] = { 0.0, 0.0, -50.0, 1.0 };
+
+	glEnable(GL_LIGHT2);
+	glLightfv(GL_LIGHT2, GL_AMBIENT, light2_ambient);
+	glLightfv(GL_LIGHT2, GL_DIFFUSE, light2_diffuse);
+	glLightfv(GL_LIGHT2, GL_SPECULAR, light2_specular);
+	glLightfv(GL_LIGHT2, GL_POSITION, light2_position);
+
+	//GLfloat spot_direction[] = { 0.0, -1.0, 0.0 };
+	//glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, spot_direction);
+	//glLightf( GL_LIGHT0, GL_SPOT_CUTOFF, 10.0);
 }
 
 void display(void)
@@ -175,7 +200,7 @@ void display(void)
 	glFlush();
 	glutSwapBuffers();
 }
-static void keyboard_func(unsigned char key, int x, int y)
+static void keyboard(unsigned char key, int x, int y)
 {
 	switch (key)
 	{
@@ -237,6 +262,10 @@ int main(int argc, char** argv)
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_NORMALIZE);
+
+	//glEnable(GL_CULL_FACE);
+	//glCullFace(GL_FRONT);
+
 	glEnable(GL_LIGHTING);
 
 	light();
@@ -246,8 +275,8 @@ int main(int argc, char** argv)
 	std::cout << "OpenGL Version:  " << glGetString(GL_VERSION) << std::endl;
 
 	glutKeyboardFunc(keyboard_func);
-	glutDisplayFunc(display);
-	glutIdleFunc(animate);
+	glutDisplayFunc(display_func);
+	glutIdleFunc(idle_func);
 
 	glutMainLoop();
 
