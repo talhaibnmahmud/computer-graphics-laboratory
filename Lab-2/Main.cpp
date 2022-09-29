@@ -275,10 +275,11 @@ int main(int argc, char** argv)
 	std::cout << "OpenGL Renderer: " << glGetString(GL_RENDERER) << std::endl;
 	std::cout << "OpenGL Version:  " << glGetString(GL_VERSION) << std::endl;
 
+	glutPassiveMotionFunc(NULL);
 	glutKeyboardFunc(keyboard_func);
+	glutSpecialFunc(special_func);
 	glutDisplayFunc(display_func);
 	glutIdleFunc(idle_func);
-	glutSpecialFunc(special_func);
 
 	glutMainLoop();
 

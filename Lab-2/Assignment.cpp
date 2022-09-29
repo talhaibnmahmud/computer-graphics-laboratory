@@ -1,6 +1,7 @@
 #include <GL/glut.h>
 
 #include <cmath>
+#include <numbers>
 
 #include "Assignment.h"
 
@@ -24,6 +25,10 @@ static bool light0 = false, light1 = false, light2 = false;
 // Camera Controls
 static GLfloat eyeX = 2, eyeY = 0, eyeZ = 10;
 static GLfloat lookX = 2, lookY = 0, lookZ = 0;
+static GLfloat upX = 0.0f, upY = 1.0f, upZ = 0.0f;
+
+
+static float yaw_angle = -90.0f, pitch_angle = 0.0f, roll_angle = 0.0f;
 
 static constexpr GLfloat cube[8][3] =
 {
@@ -93,7 +98,7 @@ static void draw_cube(GLfloat r, GLfloat g, GLfloat b)
 
 void draw_wall()
 {
-	GLfloat r = 0.0f, g = 0.4, b = 0.6;
+	GLfloat r = 0.0f, g = 0.6f, b = 0.4f;
 	glPushMatrix();
 	glTranslatef(-5.05f, -6.0f, -2.0f);
 	glScalef(0.1f, 6.0f, 7.0f);
@@ -112,19 +117,19 @@ void draw_door()
 	glPushMatrix();
 	glTranslatef(-4.5f, -6.0f, -1.9f);
 	glScalef(3.5f, 5.0f, .01f);
-	draw_cube(1.0f, 0.0f, 0.0f);
+	draw_cube(1.0f, 0.4f, 0.38f);
 	glPopMatrix();
 
 	glPushMatrix();
 	glTranslatef(-4.35f, -5.75f, -1.85f);
 	glScalef(1.5f, 4.5f, .01f);
-	draw_cube(0.2f, 0.1f, 0.1f);
+	draw_cube(0.6f, 0.3f, 0.4f);
 	glPopMatrix();
 
 	glPushMatrix();
 	glTranslatef(-2.6f, -5.75f, -1.85f);
 	glScalef(1.5f, 4.5f, 0.01f);
-	draw_cube(0.2f, 0.1f, 0.1f);
+	draw_cube(0.6f, 0.3f, 0.4f);
 	glPopMatrix();
 
 	glPushMatrix();
@@ -347,7 +352,7 @@ void draw_fan()
 	// fan base
 	glPushMatrix();
 	glTranslatef(0.0, -1.0, 0.0);
-	glScalef(0.2, 1.0, 0.2);
+	glScalef(0.2f, 1.0f, 0.2f);
 	draw_cube(r, g, b);
 	glPopMatrix();
 
@@ -415,8 +420,8 @@ static void light(
 {
 	GLfloat no_light[] = { 0.0, 0.0, 0.0, 1.0 };
 	GLfloat light_ambient[] = { 0.25, 0.25, 0.25, 1.0 };
-	GLfloat light_diffuse[] = { 0.6, 0.6, 0.6, 1.0 };
-	GLfloat light_specular[] = { 0.9, 0.9, 0.9, 1.0 };
+	GLfloat light_diffuse[] = { 0.75, 0.75, 0.75, 1.0 };
+	GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
 	GLfloat light_position[] = { x, y, z, 1.0 };
 
 	glEnable(light);
@@ -442,9 +447,9 @@ static void light(
 	}
 
 	if (spot) {
-		GLfloat spot_direction[] = { -1.0, 0.0, 0.0 };
+		GLfloat spot_direction[] = { 0.0, -1.0, 0.0 };
 		glLightfv(light, GL_SPOT_DIRECTION, spot_direction);
-		glLightf(light, GL_SPOT_CUTOFF, 55);
+		glLightf(light, GL_SPOT_CUTOFF, 100.0);
 	}
 }
 
@@ -467,7 +472,11 @@ void display_func()
 	// Load the identity matrix
 	glLoadIdentity();
 	// Set the camera
-	gluLookAt(eyeX, eyeY, eyeZ, lookX, lookY, lookZ, 0, 1, 0);
+	gluLookAt(
+		eyeX, eyeY, eyeZ,
+		lookX, lookY, lookZ,
+		upX, upY, upZ
+	);
 
 	// Set the rotation
 	glRotatef(alpha, axis_x, axis_y, axis_z);
@@ -480,14 +489,42 @@ void display_func()
 	draw_scene();
 
 	// Lights
-	light(-22, -10, -20, GL_LIGHT0, light0, false);
-	light(4.5, -11, -50.0, GL_LIGHT1, light1, false);
-	light(26, -22, -28, GL_LIGHT2, light2, true);
+	light(0.0, 0.0, -50.0, GL_LIGHT0, light0, false);
+	light(10.0, 0.0, 0.0, GL_LIGHT1, light1, false);
+	light(0.0, 50.0, 0.0, GL_LIGHT2, light2, true);
 
 	// Flush the buffer
 	glFlush();
 	// Swap buffers
 	glutSwapBuffers();
+}
+
+static void pitch()
+{
+	// Constrain pitch
+	if (pitch_angle > 179.0f) pitch_angle = 179.0f;
+	if (pitch_angle < -179.0f) pitch_angle = -179.0f;
+
+	lookX = eyeX * (cos(pitch_angle * std::numbers::pi / 180.0));
+}
+
+static void yaw()
+{
+	// Constrain yaw
+	if (yaw_angle > 179.0f) yaw_angle = 179.0f;
+	if (yaw_angle < 1.0f) yaw_angle = 1.0f;
+	
+	lookY = eyeY * (cos(yaw_angle * std::numbers::pi / 180.0));
+}
+
+void roll() // z axis
+{
+	// Constrain roll
+	if (roll_angle > 269.0f) roll_angle = 269.0f;
+	if (roll_angle < -89.0f) roll_angle = -89.0f;
+	
+	upX = eyeX * (cos(roll_angle * std::numbers::pi / 180.0));
+	upY = eyeY * (sin(roll_angle * std::numbers::pi / 180.0));
 }
 
 void keyboard_func(unsigned char key, int x, int y)
@@ -542,6 +579,40 @@ void keyboard_func(unsigned char key, int x, int y)
 		// case 'e' for Yaw right
 	case 'e':
 		lookZ++;
+		break;
+
+		// Pitch
+	case 'p':
+		pitch_angle += 1.0f;
+		pitch();
+		glutPostRedisplay();
+		break;
+	case 'P':
+		pitch_angle -= 1.0f;
+		pitch();
+		glutPostRedisplay();
+		break;
+
+		// Yaw
+	case 'o':
+		yaw_angle += 1.0f;
+		yaw();
+		glutPostRedisplay();
+		break;
+	case 'O':
+		yaw_angle -= 1.0f;
+		yaw();
+		glutPostRedisplay();
+		break;
+	
+		// Roll
+	case 'r':
+		roll_angle += 1.0f;
+		roll();
+		break;
+	case 'R':
+		roll_angle -= 1.0f;
+		roll();
 		break;
 
 		// Fan rotation
@@ -601,22 +672,35 @@ void special_func(int key, int x, int y)
 	}
 }
 
+void mouse_func(int x, int y)
+{
+	// Normalize offsets
+
+	// Update yaw and pitch
+
+	// Constrain pitch
+
+	// Update camera direction
+
+	// Normalize front
+}
+
 void idle_func()
 {
 	if (bRotate)
 	{
-		theta += 0.5f;
+		theta += 0.05f;
 		if (theta >= 360.0f) theta = 0.0f;
 	}
 	if (uRotate)
 	{
-		alpha += 0.5f;
+		alpha += 0.05f;
 		if (alpha >= 360.0f) alpha = 0.0f;
 	}
 
 	if (fan_rotate)
 	{
-		theta_fan_rotate += 5.0f;
+		theta_fan_rotate += 1.0f;
 		if (theta_fan_rotate > 360.0f) theta_fan_rotate = 0.0f;
 	}
 
