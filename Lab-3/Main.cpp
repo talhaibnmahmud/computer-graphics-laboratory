@@ -2,11 +2,12 @@
 
 #include <iostream>
 
+#include "Assignment.h"
 #include "BMPLoader.h"
 
 
-constexpr auto WINDOW_WIDTH = 700;
-constexpr auto WINDOW_HEIGHT = 700;
+constexpr auto WINDOW_WIDTH = 1280;
+constexpr auto WINDOW_HEIGHT = 720;
 
 float Txval = 0, Tyval = 0, Tzval = 0;
 float alpha = 0.0, theta = 0.0, axis_x = 0.0, axis_y = 0.0;
@@ -208,7 +209,10 @@ int main(int argc, char* argv[])
 {
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
-	glutInitWindowPosition(200, 50);
+	int screenWidth = glutGet(GLUT_SCREEN_WIDTH);
+	int screenHeight = glutGet(GLUT_SCREEN_HEIGHT);
+	glutInitWindowPosition((screenWidth - WINDOW_WIDTH) / 2, (screenHeight - WINDOW_HEIGHT) / 2);
+	//glutInitWindowPosition(200, 50);
 	glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 	glutCreateWindow("Lab-3: Textures");
 
@@ -219,21 +223,24 @@ int main(int argc, char* argv[])
 	//glEnable(GL_CULL_FACE);
 	//glCullFace(GL_FRONT);
 
+	glEnable(GL_LIGHTING);
 	glEnable(GL_TEXTURE_2D);
 
-	LoadTexture("spre.bmp", ID1);
-	LoadTexture("wood.bmp", ID2);
+	//LoadTexture("spre.bmp", ID1);
+	//LoadTexture("wood.bmp", ID2);
 	//light();
 
 	std::cout << "OpenGL Vendor:   " << glGetString(GL_VENDOR) << std::endl;
 	std::cout << "OpenGL Renderer: " << glGetString(GL_RENDERER) << std::endl;
 	std::cout << "OpenGL Version:  " << glGetString(GL_VERSION) << std::endl;
 
+	gluOrtho2D(0, WINDOW_WIDTH, 0, WINDOW_HEIGHT);
+
 	glutPassiveMotionFunc(NULL);
-	glutKeyboardFunc(myKeyboardFunc);
-	glutSpecialFunc(NULL);
-	glutDisplayFunc(display);
-	glutIdleFunc(animate);
+	glutKeyboardFunc(keyboard_func);
+	glutSpecialFunc(special_func);
+	glutDisplayFunc(display_func);
+	glutIdleFunc(idle_func);
 
 	glutMainLoop();
 

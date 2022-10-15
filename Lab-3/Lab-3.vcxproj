@@ -147,6 +147,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Assignment.cpp" />
     <ClCompile Include="BMPLoader.cpp" />
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
@@ -157,6 +158,7 @@
     <Image Include="wood.png" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Assignment.h" />
     <ClInclude Include="BMPLoader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
