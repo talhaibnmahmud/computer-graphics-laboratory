@@ -20,7 +20,7 @@ static bool fan_rotate = false;
 
 // Light controls
 static bool amb_light = true, dif_light = true, spec_light = true;
-static bool light0 = true, light1 = false, light2 = true;
+static bool light0 = false, light1 = false, light2 = true;
 
 // Camera Controls
 static GLfloat eyeX = -0, eyeY = -0, eyeZ = 50;
@@ -393,7 +393,7 @@ void draw_table()
 	glTranslatef(
 		(corner_distance - table_width + leg_width) / leg_width,
 		tr_y,
-		(table_position / leg_depth) - ((table_depth + leg_depth) / leg_depth)
+		(table_position / leg_depth) - ((table_depth - leg_depth) / leg_depth)
 	);
 	draw_cube(r, g, b);
 	glPopMatrix();
@@ -415,7 +415,7 @@ void draw_table()
 	glTranslatef(
 		(corner_distance - leg_width) / leg_width,
 		tr_y,
-		(table_position / leg_depth) - ((table_depth + leg_depth) / leg_depth)
+		(table_position / leg_depth) - ((table_depth - leg_depth) / leg_depth)
 	);
 	draw_cube(r, g, b);
 	glPopMatrix();
@@ -436,45 +436,78 @@ void draw_table()
 void draw_chair()
 {
 	GLfloat r = 0.9f, g = 0.65f, b = 0.4f;
+
+	GLfloat leg_width = 0.15f, leg_height = 3.0f, leg_depth = 0.15f;
+	GLfloat corner_distance = 30.0f, room_height = 25.0f;
+	GLfloat position = 15.0f, width = 5.0f, depth = 2.5f;
+
+	GLfloat tr_y = (-room_height + leg_height) / leg_height;
+
 	// top left leg
+	GLfloat back = 2.5f;
 	glPushMatrix();
-	glTranslatef(2.25f, -6.0f, 3.0f);
-	glScalef(0.15f, 3.0f, 0.15f);
+	glScalef(leg_width, back * leg_height, leg_depth);
+	glTranslatef(
+		(corner_distance - (3 * width) + leg_width) / leg_width,
+		(-room_height + back * leg_height) / (back * leg_height),
+		(position / leg_depth) + ((depth - leg_depth) / leg_depth)
+	);
 	draw_cube(r, g, b);
 	glPopMatrix();
 
 	// top right leg
 	glPushMatrix();
-	glTranslatef(2.25f, -6.0f, 1.75f);
-	glScalef(0.15f, 3.0f, 0.15f);
+	glScalef(leg_width, back * leg_height, leg_depth);
+	glTranslatef(
+		(corner_distance - (3 * width) + leg_width) / leg_width,
+		(-room_height + back * leg_height) / (back * leg_height),
+		(position / leg_depth) - ((depth - leg_depth) / leg_depth)
+	);
 	draw_cube(r, g, b);
 	glPopMatrix();
 
 	// bottom left leg
 	glPushMatrix();
-	glTranslatef(3.75f, -6.0f, 3.0f);
-	glScalef(0.15f, 1.5f, 0.15f);
+	glScalef(leg_width, leg_height, leg_depth);
+	glTranslatef(
+		(corner_distance - (2 * width) - leg_width) / leg_width,
+		tr_y,
+		(position / leg_depth) + ((depth - leg_depth) / leg_depth)
+	);
 	draw_cube(r, g, b);
 	glPopMatrix();
 
 	// bottom right leg
 	glPushMatrix();
-	glTranslatef(3.75f, -6.0f, 1.75f);
-	glScalef(0.15f, 1.5f, 0.15f);
+	glScalef(leg_width, leg_height, leg_depth);
+	glTranslatef(
+		(corner_distance - (2 * width) - leg_width) / leg_width,
+		tr_y,
+		(position / leg_depth) - ((depth - leg_depth) / leg_depth)
+	);
 	draw_cube(r, g, b);
 	glPopMatrix();
 
 	// chair base
+	GLfloat thickness = 0.15f;
 	glPushMatrix();
-	glTranslatef(2.25f, -4.5f, 1.7f);
-	glScalef(1.75f, 0.1f, 1.5f);
+	glScalef(width / 2, thickness, depth);
+	glTranslatef(
+		(corner_distance + (width)) / (width),
+		(-room_height + thickness) / thickness + (2 * leg_height / thickness),
+		position / depth
+	);
 	draw_cube(r, g, b);
 	glPopMatrix();
 
 	// chair back
 	glPushMatrix();
-	glTranslatef(2.25f, -3.75f, 1.7f);
-	glScalef(0.1f, 0.70f, 1.5f);
+	glScalef(leg_width, leg_height / 2, depth);
+	glTranslatef(
+		(corner_distance - (3 * width) + leg_width) / leg_width,
+		(-room_height + leg_height) / leg_height,
+		position / depth
+	);
 	draw_cube(r, g, b);
 	glPopMatrix();
 }
@@ -560,7 +593,7 @@ void draw_scene()
 	draw_door();
 	draw_bed();
 	draw_table();
-	//draw_chair();
+	draw_chair();
 	//draw_laptop();
 
 	// draw the sphere
