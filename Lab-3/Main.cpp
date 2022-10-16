@@ -13,22 +13,22 @@ float Txval = 0, Tyval = 0, Tzval = 0;
 float alpha = 0.0, theta = 0.0, axis_x = 0.0, axis_y = 0.0;
 bool bRotate = false, uRotate = false;
 
-unsigned int ID1, ID2;
+unsigned int ID;
 
-static GLfloat v_box[8][3] =
+static GLfloat quad_vertices[8][3] =
 {
-	{-2.0, 0.0, 0.0},
-	{2.0, 0.0, 0.0},
-	{-2.0, 0.0, 2.0},
-	{2.0, 0.0, 2.0},
+	{-1.0, -1.0, -1.0},
+	{ 1.0, -1.0, -1.0},
+	{-1.0, -1.0,  1.0},
+	{ 1.0, -1.0,  1.0},
 
-	{-2.0, 2.0, 0.0},
-	{2.0, 2.0, 0.0},
-	{-2.0, 2.0, 2.0},
-	{2.0, 2.0, 2.0}
+	{-1.0,  1.0, -1.0},
+	{ 1.0,  1.0, -1.0},
+	{-1.0,  1.0,  1.0},
+	{ 1.0,  1.0,  1.0}
 };
 
-static GLuint quadIndices[6][4] =
+static GLuint quad_indices[6][4] =
 {
 	{0,2,3,1},
 	{0,2,6,4},
@@ -90,14 +90,14 @@ void drawBox()
 	glBegin(GL_QUADS);
 	for (GLint i = 0; i < 6; i++)
 	{
-		getNormal3p(v_box[quadIndices[i][0]][0], v_box[quadIndices[i][0]][1], v_box[quadIndices[i][0]][2],
-			v_box[quadIndices[i][1]][0], v_box[quadIndices[i][1]][1], v_box[quadIndices[i][1]][2],
-			v_box[quadIndices[i][2]][0], v_box[quadIndices[i][2]][1], v_box[quadIndices[i][2]][2]);
+		getNormal3p(quad_vertices[quad_indices[i][0]][0], quad_vertices[quad_indices[i][0]][1], quad_vertices[quad_indices[i][0]][2],
+			quad_vertices[quad_indices[i][1]][0], quad_vertices[quad_indices[i][1]][1], quad_vertices[quad_indices[i][1]][2],
+			quad_vertices[quad_indices[i][2]][0], quad_vertices[quad_indices[i][2]][1], quad_vertices[quad_indices[i][2]][2]);
 
-		glVertex3fv(&v_box[quadIndices[i][0]][0]); glTexCoord2f(1, 0);
-		glVertex3fv(&v_box[quadIndices[i][1]][0]); glTexCoord2f(0, 0);
-		glVertex3fv(&v_box[quadIndices[i][2]][0]); glTexCoord2f(0, 1);
-		glVertex3fv(&v_box[quadIndices[i][3]][0]); glTexCoord2f(1, 1);
+		glVertex3fv(&quad_vertices[quad_indices[i][0]][0]); glTexCoord2f(1, 0);
+		glVertex3fv(&quad_vertices[quad_indices[i][1]][0]); glTexCoord2f(0, 0);
+		glVertex3fv(&quad_vertices[quad_indices[i][2]][0]); glTexCoord2f(0, 1);
+		glVertex3fv(&quad_vertices[quad_indices[i][3]][0]); glTexCoord2f(1, 1);
 
 	}
 	glEnd();
@@ -226,7 +226,7 @@ int main(int argc, char* argv[])
 	glEnable(GL_LIGHTING);
 	glEnable(GL_TEXTURE_2D);
 
-	//LoadTexture("spre.bmp", ID1);
+	LoadTexture("brick.bmp", ID);
 	//LoadTexture("wood.bmp", ID2);
 	//light();
 
