@@ -27,8 +27,8 @@ static GLfloat eyeX = -0, eyeY = -0, eyeZ = 50;
 static GLfloat lookX = -0, lookY = -0, lookZ = 0;
 static GLfloat upX = 0.0f, upY = 1.0f, upZ = 0.0f;
 
-
 static GLfloat yaw_angle = -90.0f, pitch_angle = 0.0f, roll_angle = 0.0f;
+
 
 static constexpr GLfloat cube[8][3] =
 {
@@ -48,6 +48,7 @@ static constexpr GLuint indices[2][8] =
 	{3, 5, 1, 7, 0, 6, 2, 4}
 };
 
+
 static void draw_sphere(GLfloat r, GLfloat g, GLfloat b)
 {
 	GLfloat no_mat[] = { 0.0, 0.0, 0.0, 1.0 };
@@ -65,6 +66,80 @@ static void draw_sphere(GLfloat r, GLfloat g, GLfloat b)
 	glTranslatef(3.5, -5.25, 4.5);
 	glutSolidSphere(0.75l, 20, 16);
 	glPopMatrix();
+}
+
+static GLfloat quad_vertices[8][3] =
+{
+	{-1.0, -1.0, -1.0},
+	{ 1.0, -1.0, -1.0},
+	{-1.0, -1.0,  1.0},
+	{ 1.0, -1.0,  1.0},
+
+	{-1.0,  1.0, -1.0},
+	{ 1.0,  1.0, -1.0},
+	{-1.0,  1.0,  1.0},
+	{ 1.0,  1.0,  1.0}
+};
+
+static GLuint quad_indices[6][4] =
+{
+	{0,2,3,1},
+	{0,2,6,4},
+	{2,3,7,6},
+	{1,3,7,5},
+	{1,5,4,0},
+	{6,7,5,4}
+};
+
+static void get_normal(
+	GLfloat x1, GLfloat y1, GLfloat z1,
+	GLfloat x2, GLfloat y2, GLfloat z2,
+	GLfloat x3, GLfloat y3, GLfloat z3)
+{
+	GLfloat Ux, Uy, Uz, Vx, Vy, Vz, Nx, Ny, Nz;
+
+	Ux = x2 - x1;
+	Uy = y2 - y1;
+	Uz = z2 - z1;
+
+	Vx = x3 - x1;
+	Vy = y3 - y1;
+	Vz = z3 - z1;
+
+	Nx = Uy * Vz - Uz * Vy;
+	Ny = Uz * Vx - Ux * Vz;
+	Nz = Ux * Vy - Uy * Vx;
+
+	glNormal3f(Nx, Ny, Nz);
+}
+
+static void draw_textured_cube()
+{
+	GLfloat no_mat[] = { 0.0, 0.0, 0.0, 1.0 };
+	GLfloat mat_ambient[] = { 1.0, 1.0, 1.0, 1.0 };
+	GLfloat mat_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
+	GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+	GLfloat mat_shininess[] = { 60 };
+
+	glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+	glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+
+	glBegin(GL_QUADS);
+	for (GLint i = 0; i < 6; i++)
+	{
+		get_normal(quad_vertices[quad_indices[i][0]][0], quad_vertices[quad_indices[i][0]][1], quad_vertices[quad_indices[i][0]][2],
+			quad_vertices[quad_indices[i][1]][0], quad_vertices[quad_indices[i][1]][1], quad_vertices[quad_indices[i][1]][2],
+			quad_vertices[quad_indices[i][2]][0], quad_vertices[quad_indices[i][2]][1], quad_vertices[quad_indices[i][2]][2]);
+
+		glVertex3fv(&quad_vertices[quad_indices[i][0]][0]); glTexCoord2f(1, 0);
+		glVertex3fv(&quad_vertices[quad_indices[i][1]][0]); glTexCoord2f(0, 0);
+		glVertex3fv(&quad_vertices[quad_indices[i][2]][0]); glTexCoord2f(0, 1);
+		glVertex3fv(&quad_vertices[quad_indices[i][3]][0]); glTexCoord2f(1, 1);
+
+	}
+	glEnd();
 }
 
 static void draw_cube(GLfloat r, GLfloat g, GLfloat b)
@@ -105,21 +180,24 @@ void draw_wall()
 	glPushMatrix();
 	glScalef(thickness, wall_height, wall_depth);
 	glTranslatef(-wall_width / thickness, 0.0f, 0.0f);
-	draw_cube(r, g, b);
+	//draw_cube(r, g, b);
+	draw_textured_cube();
 	glPopMatrix();
 
 	// Right Wall
 	glPushMatrix();
 	glScalef(thickness, wall_height, wall_depth);
 	glTranslatef(wall_width / thickness, 0.0f, 0.0f);
-	draw_cube(r, g, b);
+	//draw_cube(r, g, b);
+	draw_textured_cube();
 	glPopMatrix();
 
 	// Back Wall
 	glPushMatrix();
 	glScalef(wall_width + thickness / 2, wall_height, thickness);
 	glTranslatef(0.0f, 0.0f, -wall_depth / thickness);
-	draw_cube(r, g, b);
+	//draw_cube(r, g, b);
+	draw_textured_cube();
 	glPopMatrix();
 }
 
