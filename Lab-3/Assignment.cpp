@@ -291,38 +291,66 @@ void draw_bed()
 void draw_table()
 {
 	GLfloat r = 0.625f, g = 0.25f, b = 0.0f;
+
+	GLfloat leg_width = 0.25f, leg_height = 5.0f, leg_depth = 0.25f;
+	GLfloat corner_distance = 30.0f, room_height = 25.0f;
+	GLfloat table_position = 15.0f, table_width = 10.0f, table_depth = 5.0f;
+
+	GLfloat tr_y = (-room_height + leg_height) / leg_height;
+
 	// top left leg
 	glPushMatrix();
-	glTranslatef(3.5f, -6.0f, 3.25f);
-	glScalef(0.15f, 2.5f, 0.15f);
+	glScalef(leg_width, leg_height, leg_depth);
+	glTranslatef(
+		(corner_distance - table_width + leg_width) / leg_width,
+		tr_y,
+		(table_position / leg_depth) + ((table_depth - leg_depth) / leg_depth)
+	);
 	draw_cube(r, g, b);
 	glPopMatrix();
 
 	// top right leg
 	glPushMatrix();
-	glTranslatef(3.5f, -6.0, 0.75f);
-	glScalef(0.15f, 2.5f, 0.15f);
+	glScalef(leg_width, leg_height, leg_depth);
+	glTranslatef(
+		(corner_distance - table_width + leg_width) / leg_width,
+		tr_y,
+		(table_position / leg_depth) - ((table_depth + leg_depth) / leg_depth)
+	);
 	draw_cube(r, g, b);
 	glPopMatrix();
 
 	// bottom left leg
 	glPushMatrix();
-	glTranslatef(4.75f, -6.0f, 3.25f);
-	glScalef(0.15f, 2.5f, 0.15f);
+	glScalef(leg_width, leg_height, leg_depth);
+	glTranslatef(
+		(corner_distance - leg_width) / leg_width,
+		tr_y,
+		(table_position / leg_depth) + ((table_depth - leg_depth) / leg_depth)
+	);
 	draw_cube(r, g, b);
 	glPopMatrix();
 
 	// bottom right leg
 	glPushMatrix();
-	glTranslatef(4.75f, -6.0f, 0.75f);
-	glScalef(0.15f, 2.5f, 0.15f);
+	glScalef(leg_width, leg_height, leg_depth);
+	glTranslatef(
+		(corner_distance - leg_width) / leg_width,
+		tr_y,
+		(table_position / leg_depth) - ((table_depth + leg_depth) / leg_depth)
+	);
 	draw_cube(r, g, b);
 	glPopMatrix();
 
 	// table top
+	GLfloat thickness = 0.15f;
 	glPushMatrix();
-	glTranslatef(3.375f, -3.65f, 0.65f);
-	glScalef(1.75f, 0.15f, 3.0f);
+	glScalef(table_width / 2, thickness, table_depth);
+	glTranslatef(
+		(corner_distance - (table_width / 2)) / (table_width / 2),
+		(-room_height + thickness) / thickness + (2 * leg_height / thickness),
+		table_position / table_depth
+	);
 	draw_cube(r, g, b);
 	glPopMatrix();
 }
@@ -453,7 +481,7 @@ void draw_scene()
 
 	draw_door();
 	draw_bed();
-	//draw_table();
+	draw_table();
 	//draw_chair();
 	//draw_laptop();
 
