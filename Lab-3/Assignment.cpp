@@ -20,7 +20,7 @@ static bool fan_rotate = false;
 
 // Light controls
 static bool amb_light = true, dif_light = true, spec_light = true;
-static bool light0 = true, light1 = true, light2 = true;
+static bool light0 = true, light1 = false, light2 = true;
 
 // Camera Controls
 static GLfloat eyeX = -0, eyeY = -0, eyeZ = 50;
@@ -99,26 +99,26 @@ static void draw_cube(GLfloat r, GLfloat g, GLfloat b)
 void draw_wall()
 {
 	GLfloat r = 0.0f, g = 0.6f, b = 0.4f;
-	
+
 	GLfloat wall_width = 30.0f, wall_height = 25.0f, wall_depth = 25.0f, thickness = 0.25f;
 	// Left Wall
 	glPushMatrix();
 	glScalef(thickness, wall_height, wall_depth);
-	glTranslatef(-wall_width/thickness, 0.0f, 0.0f);
+	glTranslatef(-wall_width / thickness, 0.0f, 0.0f);
 	draw_cube(r, g, b);
 	glPopMatrix();
 
 	// Right Wall
 	glPushMatrix();
 	glScalef(thickness, wall_height, wall_depth);
-	glTranslatef(wall_width/thickness, 0.0f, 0.0f);
+	glTranslatef(wall_width / thickness, 0.0f, 0.0f);
 	draw_cube(r, g, b);
 	glPopMatrix();
 
 	// Back Wall
 	glPushMatrix();
-	glScalef(wall_width + thickness/2, wall_height, thickness);
-	glTranslatef(0.0f, 0.0f, -wall_depth/thickness);
+	glScalef(wall_width + thickness / 2, wall_height, thickness);
+	glTranslatef(0.0f, 0.0f, -wall_depth / thickness);
 	draw_cube(r, g, b);
 	glPopMatrix();
 }
@@ -131,15 +131,15 @@ void draw_floor()
 
 	// Draw the floor
 	glPushMatrix();
-	glScalef(floor_width + thickness/2, thickness, floor_depth);
-	glTranslatef(0.0f, -wall_height/thickness, 0.0f);
+	glScalef(floor_width + thickness / 2, thickness, floor_depth);
+	glTranslatef(0.0f, -wall_height / thickness, 0.0f);
 	draw_cube(r, g, b);
 	glPopMatrix();
 
 	// Draw the roof
 	glPushMatrix();
-	glScalef(floor_width + thickness/2, thickness, floor_depth);
-	glTranslatef(0.0f, wall_height/thickness, 0.0f);
+	glScalef(floor_width + thickness / 2, thickness, floor_depth);
+	glTranslatef(0.0f, wall_height / thickness, 0.0f);
 	draw_cube(r, g, b);
 	glPopMatrix();
 }
@@ -149,31 +149,35 @@ void draw_door()
 	// Door Base
 	glPushMatrix();
 	glScalef(5.0f, 10.0f, 0.15f);
-	glTranslatef(0.0f, (-25.0/10.0) + 1, -25.0/0.15 + 1);
+	glTranslatef(0.0f, (-25.0 / 10.0) + 1, -25.0 / 0.15 + 1);
 	draw_cube(1.0f, 0.4f, 0.4f);
 	glPopMatrix();
 
+	// Left part
 	glPushMatrix();
-	glTranslatef(-4.35f, -5.75f, -1.85f);
-	glScalef(1.5f, 4.5f, .01f);
+	glScalef(2.25f, 10.0f, 0.15f);
+	glTranslatef(-1.125, (-25.0 / 10.0) + 1, -25.0 / 0.15 + 1.15);
 	draw_cube(0.6f, 0.3f, 0.4f);
 	glPopMatrix();
 
+	// Right Part
 	glPushMatrix();
-	glTranslatef(-2.6f, -5.75f, -1.85f);
-	glScalef(1.5f, 4.5f, 0.01f);
+	glScalef(2.25f, 10.0f, 0.15f);
+	glTranslatef(1.125f, (-25.0 / 10.0) + 1, -25.0 / 0.15 + 1.15);
 	draw_cube(0.6f, 0.3f, 0.4f);
 	glPopMatrix();
 
+	// Left Handle
 	glPushMatrix();
-	glTranslatef(-2.25f, -3.25f, -1.8f);
-	glScalef(.05f, 0.75f, 0.1f);
+	glScalef(0.15f, 1.0f, 0.25f);
+	glTranslatef(-1.5 / 0.15, -12.5f, -25.0 / 0.25 + 1.25);
 	draw_cube(1.0f, 1.0f, 1.0f);
 	glPopMatrix();
 
+	// Right Handle
 	glPushMatrix();
-	glTranslatef(-3.25f, -3.25f, -1.8f);
-	glScalef(.05f, 0.75f, 0.1f);
+	glScalef(0.15f, 1.0f, 0.25f);
+	glTranslatef(1.5 / 0.15, -12.5f, -25.0 / 0.25 + 1.25);
 	draw_cube(1.0f, 1.0f, 1.0f);
 	glPopMatrix();
 }
@@ -181,73 +185,105 @@ void draw_door()
 void draw_bed()
 {
 	GLfloat r = 0.5137f, g = 0.4118f, b = 0.3255f;
+
+	GLfloat leg_width = 0.5f, leg_height = 5.0f, leg_depth = 0.5f;
+	GLfloat corner_distance = 30.0f, room_height = 25.0f;
+	GLfloat bed_position = 10.0f;
+
+	GLfloat tr_y = (-room_height + leg_height) / leg_height;
 	// top left leg
 	glPushMatrix();
-	glTranslatef(-5.0f, -6.0f, 3.25f);
-	glScalef(0.5f, 3.0f, 0.25f);
+	glScalef(leg_width, leg_height, leg_depth);
+	glTranslatef((-corner_distance + leg_width) / leg_width, tr_y, bed_position / leg_depth);
 	draw_cube(r, g, b);
 	glPopMatrix();
 
 	// top right leg
 	glPushMatrix();
-	glTranslatef(-5.0f, -6.0f, 0.25f);
-	glScalef(0.5f, 3.0f, 0.25f);
+	glScalef(leg_width, leg_height, leg_depth);
+	glTranslatef((-corner_distance + leg_width) / leg_width, tr_y, 0.0f);
 	draw_cube(r, g, b);
 	glPopMatrix();
 
 	// bottom right leg
 	glPushMatrix();
-	glTranslatef(0.25f, -6.0f, 0.25f);
-	glScalef(0.5f, 3.0f, 0.25f);
+	glScalef(leg_width, leg_height, leg_depth);
+	glTranslatef(0.0f, tr_y, 0.0f);
 	draw_cube(r, g, b);
 	glPopMatrix();
 
 	// bottom left leg
 	glPushMatrix();
-	glTranslatef(0.25f, -6.0f, 3.25f);
-	glScalef(0.5f, 3.0f, 0.25f);
+	glScalef(leg_width, leg_height, leg_depth);
+	glTranslatef(0.0f, tr_y, bed_position / leg_depth);
 	draw_cube(r, g, b);
 	glPopMatrix();
 
+	GLfloat plate_height = leg_height / 2.0f;
 	// head plate
 	glPushMatrix();
-	glTranslatef(-5.0f, -5.25f, 0.25f);
-	glScalef(0.5f, 1.75f, 3.0f);
+	glScalef(leg_width, plate_height, bed_position / 2);
+	glTranslatef(
+		(-corner_distance + leg_width) / leg_width,
+		(-room_height + plate_height + leg_height) / plate_height,
+		(bed_position / 2) / (bed_position / 2)
+	);
 	draw_cube(r, g, b);
 	glPopMatrix();
 
 	// feet plate
 	glPushMatrix();
-	glTranslatef(0.25f, -5.25f, 0.25f);
-	glScalef(0.5f, 1.75f, 3.0f);
+	glScalef(leg_width, plate_height, bed_position / 2);
+	glTranslatef(
+		0.0f,
+		(-room_height + plate_height + leg_height) / plate_height,
+		(bed_position / 2) / (bed_position / 2)
+	);
 	draw_cube(r, g, b);
 	glPopMatrix();
 
 	// bed
+	GLfloat bed_length = 15.0f, bed_width = bed_position / 2 + 0.5, bed_thickness = 1.0f;
 	glPushMatrix();
-	glTranslatef(-5.0f, -5.25f, 0.25f);
-	glScalef(5.5f, 1.0f, 3.0f);
+	glScalef(bed_length, bed_thickness, bed_width);
+	glTranslatef(
+		(-corner_distance + bed_length) / bed_length,
+		(-room_height + bed_thickness) + (leg_height + (leg_height / 2) + (bed_thickness / 2)),
+		(bed_position / 2) / bed_width
+	);
 	draw_cube(r, g, b);
 	glPopMatrix();
 
 	// matress
 	glPushMatrix();
-	glTranslatef(-5.0f, -4.25f, 0.25f);
-	glScalef(5.5f, 0.5f, 3.0f);
+	glScalef(bed_length, bed_thickness, bed_width);
+	glTranslatef(
+		(-corner_distance + bed_length) / bed_length,
+		(-room_height + bed_thickness) + (leg_height + (leg_height / 2) + 1.0 * 2),
+		(bed_position / 2) / bed_width
+	);
 	draw_cube(1.0f, 1.0f, 1.0f);
 	glPopMatrix();
 
 	// blanket
 	glPushMatrix();
-	glTranslatef(-3.0f, -4.20f, 0.26f);
-	glScalef(3.5f, 0.51f, 3.01f);
+	glScalef(bed_length / 2, 1.0f, bed_width + 0.1);
+	glTranslatef(
+		-1,
+		(-room_height + bed_thickness) + (leg_height + (leg_height / 2) + 1.0 * 3),
+		(bed_position / 2) / bed_width
+	);
 	draw_cube(0.46f, 0.86f, 0.46f);
 	glPopMatrix();
 
 	// pillow
 	glPushMatrix();
-	glTranslatef(-4.5f, -3.75f, 0.75f);
-	glScalef(1.25f, 0.25f, 2.0f);
+	glScalef(bed_length / 5, bed_thickness, bed_width / 2);
+	glTranslatef(
+		(-corner_distance + (bed_length / 5)) / (bed_length / 5),
+		(-room_height + bed_thickness) + (leg_height + (leg_height / 2) + 1.0 * 3),
+		(bed_position / 2) / (bed_width / 2)
+	);
 	draw_cube(0.55f, 0.35f, 0.15f);
 	glPopMatrix();
 }
@@ -414,9 +450,9 @@ void draw_scene()
 {
 	draw_wall();
 	draw_floor();
-	
-	//draw_door();
-	//draw_bed();
+
+	draw_door();
+	draw_bed();
 	//draw_table();
 	//draw_chair();
 	//draw_laptop();
