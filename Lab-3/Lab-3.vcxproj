@@ -152,13 +152,14 @@
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="blanket.bmp" />
     <Image Include="brick.bmp" />
     <Image Include="floor.bmp" />
-    <Image Include="spre.bmp" />
+    <Image Include="matress.bmp" />
+    <Image Include="pillow.bmp" />
     <Image Include="table-leg.bmp" />
     <Image Include="table-top.bmp" />
     <Image Include="wood.bmp" />
-    <Image Include="wood.png" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Assignment.h" />

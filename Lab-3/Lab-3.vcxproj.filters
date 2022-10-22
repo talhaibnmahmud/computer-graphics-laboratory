@@ -26,15 +26,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="spre.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="wood.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="wood.png">
-      <Filter>Resource Files</Filter>
-    </Image>
     <Image Include="brick.bmp">
       <Filter>Resource Files</Filter>
     </Image>
@@ -45,6 +36,18 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="table-leg.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="matress.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="blanket.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="pillow.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="wood.bmp">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

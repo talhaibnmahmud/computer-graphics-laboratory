@@ -230,6 +230,10 @@ int main(int argc, char* argv[])
 	LoadTexture("brick.bmp", textures[1]);
 	LoadTexture("table-leg.bmp", textures[2]);
 	LoadTexture("table-top.bmp", textures[3]);
+	LoadTexture("matress.bmp", textures[4]);
+	LoadTexture("blanket.bmp", textures[5]);
+	LoadTexture("pillow.bmp", textures[6]);
+	LoadTexture("wood.bmp", textures[7]);
 	//light();
 
 	std::cout << "OpenGL Vendor:   " << glGetString(GL_VENDOR) << std::endl;

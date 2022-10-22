@@ -139,10 +139,10 @@ static void draw_textured_cube()
 			quad_vertices[quad_indices[i][2]][0], quad_vertices[quad_indices[i][2]][1], quad_vertices[quad_indices[i][2]][2]
 		);
 
-		glVertex3fv(&quad_vertices[quad_indices[i][0]][0]); glTexCoord2f(1, 0);
-		glVertex3fv(&quad_vertices[quad_indices[i][1]][0]); glTexCoord2f(0, 0);
-		glVertex3fv(&quad_vertices[quad_indices[i][2]][0]); glTexCoord2f(0, 1);
-		glVertex3fv(&quad_vertices[quad_indices[i][3]][0]); glTexCoord2f(1, 1);
+		glVertex3fv(&quad_vertices[quad_indices[i][0]][0]); glTexCoord2f(0, 0);
+		glVertex3fv(&quad_vertices[quad_indices[i][1]][0]); glTexCoord2f(0, 1);
+		glVertex3fv(&quad_vertices[quad_indices[i][2]][0]); glTexCoord2f(1, 1);
+		glVertex3fv(&quad_vertices[quad_indices[i][3]][0]); glTexCoord2f(1, 0);
 
 	}
 	glEnd();
@@ -243,39 +243,54 @@ void draw_floor()
 void draw_door()
 {
 	// Door Base
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textures[2]);
 	glPushMatrix();
 	glScalef(5.0f, 10.0f, 0.15f);
 	glTranslatef(0.0f, (-25.0 / 10.0) + 1, -25.0 / 0.15 + 1);
-	draw_cube(1.0f, 0.4f, 0.4f);
+	draw_textured_cube();
 	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
 
 	// Left part
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textures[7]);
 	glPushMatrix();
 	glScalef(2.25f, 10.0f, 0.15f);
 	glTranslatef(-1.125, (-25.0 / 10.0) + 1, -25.0 / 0.15 + 1.15);
-	draw_cube(0.6f, 0.3f, 0.4f);
+	draw_textured_cube();
 	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
 
 	// Right Part
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textures[7]);
 	glPushMatrix();
 	glScalef(2.25f, 10.0f, 0.15f);
 	glTranslatef(1.125f, (-25.0 / 10.0) + 1, -25.0 / 0.15 + 1.15);
-	draw_cube(0.6f, 0.3f, 0.4f);
+	draw_textured_cube();
 	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
 
 	// Left Handle
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textures[0]);
 	glPushMatrix();
 	glScalef(0.15f, 1.0f, 0.25f);
 	glTranslatef(-1.5 / 0.15, -12.5f, -25.0 / 0.25 + 1.25);
-	draw_cube(1.0f, 1.0f, 1.0f);
+	draw_textured_cube();
 	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
 
 	// Right Handle
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textures[0]);
 	glPushMatrix();
 	glScalef(0.15f, 1.0f, 0.25f);
 	glTranslatef(1.5 / 0.15, -12.5f, -25.0 / 0.25 + 1.25);
-	draw_cube(1.0f, 1.0f, 1.0f);
+	draw_textured_cube();
 	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
 }
 
 void draw_bed()
@@ -287,36 +302,51 @@ void draw_bed()
 	GLfloat bed_position = 10.0f;
 
 	GLfloat tr_y = (-room_height + leg_height) / leg_height;
+	
 	// top left leg
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textures[7]);
 	glPushMatrix();
 	glScalef(leg_width, leg_height, leg_depth);
 	glTranslatef((-corner_distance + leg_width) / leg_width, tr_y, bed_position / leg_depth);
-	draw_cube(r, g, b);
+	draw_textured_cube();
 	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
 
 	// top right leg
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textures[7]);
 	glPushMatrix();
 	glScalef(leg_width, leg_height, leg_depth);
 	glTranslatef((-corner_distance + leg_width) / leg_width, tr_y, 0.0f);
-	draw_cube(r, g, b);
+	draw_textured_cube();
 	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
 
 	// bottom right leg
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textures[7]);
 	glPushMatrix();
 	glScalef(leg_width, leg_height, leg_depth);
 	glTranslatef(0.0f, tr_y, 0.0f);
-	draw_cube(r, g, b);
+	draw_textured_cube();
 	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
 
 	// bottom left leg
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textures[7]);
 	glPushMatrix();
 	glScalef(leg_width, leg_height, leg_depth);
 	glTranslatef(0.0f, tr_y, bed_position / leg_depth);
-	draw_cube(r, g, b);
+	draw_textured_cube();
 	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
 
 	GLfloat plate_height = leg_height / 2.0f;
 	// head plate
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textures[7]);
 	glPushMatrix();
 	glScalef(leg_width, plate_height, bed_position / 2);
 	glTranslatef(
@@ -324,10 +354,13 @@ void draw_bed()
 		(-room_height + plate_height + leg_height) / plate_height,
 		(bed_position / 2) / (bed_position / 2)
 	);
-	draw_cube(r, g, b);
+	draw_textured_cube();
 	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
 
 	// feet plate
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textures[7]);
 	glPushMatrix();
 	glScalef(leg_width, plate_height, bed_position / 2);
 	glTranslatef(
@@ -335,11 +368,14 @@ void draw_bed()
 		(-room_height + plate_height + leg_height) / plate_height,
 		(bed_position / 2) / (bed_position / 2)
 	);
-	draw_cube(r, g, b);
+	draw_textured_cube();
 	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
 
 	// bed
 	GLfloat bed_length = 15.0f, bed_width = bed_position / 2 + 0.5, bed_thickness = 1.0f;
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textures[7]);
 	glPushMatrix();
 	glScalef(bed_length, bed_thickness, bed_width);
 	glTranslatef(
@@ -347,10 +383,13 @@ void draw_bed()
 		(-room_height + bed_thickness) + (leg_height + (leg_height / 2) + (bed_thickness / 2)),
 		(bed_position / 2) / bed_width
 	);
-	draw_cube(r, g, b);
+	draw_textured_cube();
 	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
 
 	// matress
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textures[4]);
 	glPushMatrix();
 	glScalef(bed_length, bed_thickness, bed_width);
 	glTranslatef(
@@ -358,10 +397,13 @@ void draw_bed()
 		(-room_height + bed_thickness) + (leg_height + (leg_height / 2) + 1.0 * 2),
 		(bed_position / 2) / bed_width
 	);
-	draw_cube(1.0f, 1.0f, 1.0f);
+	draw_textured_cube();
 	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
 
 	// blanket
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textures[5]);
 	glPushMatrix();
 	glScalef(bed_length / 2, 1.0f, bed_width + 0.1);
 	glTranslatef(
@@ -369,10 +411,13 @@ void draw_bed()
 		(-room_height + bed_thickness) + (leg_height + (leg_height / 2) + 1.0 * 3),
 		(bed_position / 2) / bed_width
 	);
-	draw_cube(0.46f, 0.86f, 0.46f);
+	draw_textured_cube();
 	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
 
 	// pillow
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textures[6]);
 	glPushMatrix();
 	glScalef(bed_length / 5, bed_thickness, bed_width / 2);
 	glTranslatef(
@@ -380,8 +425,9 @@ void draw_bed()
 		(-room_height + bed_thickness) + (leg_height + (leg_height / 2) + 1.0 * 3),
 		(bed_position / 2) / (bed_width / 2)
 	);
-	draw_cube(0.55f, 0.35f, 0.15f);
+	draw_textured_cube();
 	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
 }
 
 void draw_table()
@@ -477,6 +523,8 @@ void draw_chair()
 
 	// top left leg
 	GLfloat back = 2.5f;
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textures[2]);
 	glPushMatrix();
 	glScalef(leg_width, back * leg_height, leg_depth);
 	glTranslatef(
@@ -484,10 +532,13 @@ void draw_chair()
 		(-room_height + back * leg_height) / (back * leg_height),
 		(position / leg_depth) + ((depth - leg_depth) / leg_depth)
 	);
-	draw_cube(r, g, b);
+	draw_textured_cube();
 	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
 
 	// top right leg
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textures[2]);
 	glPushMatrix();
 	glScalef(leg_width, back * leg_height, leg_depth);
 	glTranslatef(
@@ -495,10 +546,13 @@ void draw_chair()
 		(-room_height + back * leg_height) / (back * leg_height),
 		(position / leg_depth) - ((depth - leg_depth) / leg_depth)
 	);
-	draw_cube(r, g, b);
+	draw_textured_cube();
 	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
 
 	// bottom left leg
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textures[2]);
 	glPushMatrix();
 	glScalef(leg_width, leg_height, leg_depth);
 	glTranslatef(
@@ -506,10 +560,13 @@ void draw_chair()
 		tr_y,
 		(position / leg_depth) + ((depth - leg_depth) / leg_depth)
 	);
-	draw_cube(r, g, b);
+	draw_textured_cube();
 	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
 
 	// bottom right leg
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textures[2]);
 	glPushMatrix();
 	glScalef(leg_width, leg_height, leg_depth);
 	glTranslatef(
@@ -517,11 +574,14 @@ void draw_chair()
 		tr_y,
 		(position / leg_depth) - ((depth - leg_depth) / leg_depth)
 	);
-	draw_cube(r, g, b);
+	draw_textured_cube();
 	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
 
 	// chair base
 	GLfloat thickness = 0.15f;
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textures[7]);
 	glPushMatrix();
 	glScalef(width / 2, thickness, depth);
 	glTranslatef(
@@ -529,10 +589,13 @@ void draw_chair()
 		(-room_height + thickness) / thickness + (2 * leg_height / thickness),
 		position / depth
 	);
-	draw_cube(r, g, b);
+	draw_textured_cube();
 	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
 
 	// chair back
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textures[7]);
 	glPushMatrix();
 	glScalef(leg_width, leg_height / 2, depth);
 	glTranslatef(
@@ -540,8 +603,9 @@ void draw_chair()
 		(-room_height + leg_height) / leg_height,
 		position / depth
 	);
-	draw_cube(r, g, b);
+	draw_textured_cube();
 	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
 }
 
 void draw_laptop()
