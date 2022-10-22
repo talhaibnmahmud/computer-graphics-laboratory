@@ -395,6 +395,8 @@ void draw_table()
 	GLfloat tr_y = (-room_height + leg_height) / leg_height;
 
 	// top left leg
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textures[2]);
 	glPushMatrix();
 	glScalef(leg_width, leg_height, leg_depth);
 	glTranslatef(
@@ -402,10 +404,13 @@ void draw_table()
 		tr_y,
 		(table_position / leg_depth) + ((table_depth - leg_depth) / leg_depth)
 	);
-	draw_cube(r, g, b);
+	draw_textured_cube();
 	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
 
 	// top right leg
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textures[2]);
 	glPushMatrix();
 	glScalef(leg_width, leg_height, leg_depth);
 	glTranslatef(
@@ -413,10 +418,13 @@ void draw_table()
 		tr_y,
 		(table_position / leg_depth) - ((table_depth - leg_depth) / leg_depth)
 	);
-	draw_cube(r, g, b);
+	draw_textured_cube();
 	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
 
 	// bottom left leg
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textures[2]);
 	glPushMatrix();
 	glScalef(leg_width, leg_height, leg_depth);
 	glTranslatef(
@@ -424,10 +432,13 @@ void draw_table()
 		tr_y,
 		(table_position / leg_depth) + ((table_depth - leg_depth) / leg_depth)
 	);
-	draw_cube(r, g, b);
+	draw_textured_cube();
 	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
 
 	// bottom right leg
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textures[2]);
 	glPushMatrix();
 	glScalef(leg_width, leg_height, leg_depth);
 	glTranslatef(
@@ -435,11 +446,14 @@ void draw_table()
 		tr_y,
 		(table_position / leg_depth) - ((table_depth - leg_depth) / leg_depth)
 	);
-	draw_cube(r, g, b);
+	draw_textured_cube();
 	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
 
 	// table top
 	GLfloat thickness = 0.15f;
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textures[2]);
 	glPushMatrix();
 	glScalef(table_width / 2, thickness, table_depth);
 	glTranslatef(
@@ -447,7 +461,7 @@ void draw_table()
 		(-room_height + thickness) / thickness + (2 * leg_height / thickness),
 		table_position / table_depth
 	);
-	draw_cube(r, g, b);
+	draw_textured_cube();
 	glPopMatrix();
 }
 

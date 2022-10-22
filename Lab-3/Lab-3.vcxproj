@@ -153,7 +153,10 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="brick.bmp" />
+    <Image Include="floor.bmp" />
     <Image Include="spre.bmp" />
+    <Image Include="table-leg.bmp" />
+    <Image Include="table-top.bmp" />
     <Image Include="wood.bmp" />
     <Image Include="wood.png" />
   </ItemGroup>

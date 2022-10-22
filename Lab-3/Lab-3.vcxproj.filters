@@ -38,6 +38,15 @@
     <Image Include="brick.bmp">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="table-top.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="floor.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="table-leg.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BMPLoader.h">

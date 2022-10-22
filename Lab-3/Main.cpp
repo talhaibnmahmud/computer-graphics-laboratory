@@ -226,8 +226,10 @@ int main(int argc, char* argv[])
 	glEnable(GL_LIGHTING);
 
 	glGenTextures(texture_count, textures);
-	LoadTexture("spre.bmp", textures[0]);
+	LoadTexture("floor.bmp", textures[0]);
 	LoadTexture("brick.bmp", textures[1]);
+	LoadTexture("table-leg.bmp", textures[2]);
+	LoadTexture("table-top.bmp", textures[3]);
 	//light();
 
 	std::cout << "OpenGL Vendor:   " << glGetString(GL_VENDOR) << std::endl;
