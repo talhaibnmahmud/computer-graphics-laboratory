@@ -1,4 +1,4 @@
-#include <GL/glut.h>
+#include <GL/freeglut.h>
 
 #include <cmath>
 #include <numbers>
@@ -28,6 +28,10 @@ static GLfloat lookX = -0, lookY = -0, lookZ = 0;
 static GLfloat upX = 0.0f, upY = 1.0f, upZ = 0.0f;
 
 static GLfloat yaw_angle = -90.0f, pitch_angle = 0.0f, roll_angle = 0.0f;
+
+// Textures
+extern constexpr unsigned int texture_count = 8;
+extern unsigned int textures[texture_count];
 
 
 static constexpr GLfloat cube[8][3] =
@@ -129,9 +133,11 @@ static void draw_textured_cube()
 	glBegin(GL_QUADS);
 	for (GLint i = 0; i < 6; i++)
 	{
-		get_normal(quad_vertices[quad_indices[i][0]][0], quad_vertices[quad_indices[i][0]][1], quad_vertices[quad_indices[i][0]][2],
+		get_normal(
+			quad_vertices[quad_indices[i][0]][0], quad_vertices[quad_indices[i][0]][1], quad_vertices[quad_indices[i][0]][2],
 			quad_vertices[quad_indices[i][1]][0], quad_vertices[quad_indices[i][1]][1], quad_vertices[quad_indices[i][1]][2],
-			quad_vertices[quad_indices[i][2]][0], quad_vertices[quad_indices[i][2]][1], quad_vertices[quad_indices[i][2]][2]);
+			quad_vertices[quad_indices[i][2]][0], quad_vertices[quad_indices[i][2]][1], quad_vertices[quad_indices[i][2]][2]
+		);
 
 		glVertex3fv(&quad_vertices[quad_indices[i][0]][0]); glTexCoord2f(1, 0);
 		glVertex3fv(&quad_vertices[quad_indices[i][1]][0]); glTexCoord2f(0, 0);
@@ -176,29 +182,39 @@ void draw_wall()
 	GLfloat r = 0.0f, g = 0.6f, b = 0.4f;
 
 	GLfloat wall_width = 30.0f, wall_height = 25.0f, wall_depth = 25.0f, thickness = 0.25f;
+	
 	// Left Wall
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textures[1]);
 	glPushMatrix();
 	glScalef(thickness, wall_height, wall_depth);
 	glTranslatef(-wall_width / thickness, 0.0f, 0.0f);
 	//draw_cube(r, g, b);
 	draw_textured_cube();
 	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
 
 	// Right Wall
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textures[1]);
 	glPushMatrix();
 	glScalef(thickness, wall_height, wall_depth);
 	glTranslatef(wall_width / thickness, 0.0f, 0.0f);
 	//draw_cube(r, g, b);
 	draw_textured_cube();
 	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
 
 	// Back Wall
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textures[1]);
 	glPushMatrix();
 	glScalef(wall_width + thickness / 2, wall_height, thickness);
 	glTranslatef(0.0f, 0.0f, -wall_depth / thickness);
 	//draw_cube(r, g, b);
 	draw_textured_cube();
 	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
 }
 
 void draw_floor()

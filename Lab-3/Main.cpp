@@ -13,7 +13,8 @@ float Txval = 0, Tyval = 0, Tzval = 0;
 float alpha = 0.0, theta = 0.0, axis_x = 0.0, axis_y = 0.0;
 bool bRotate = false, uRotate = false;
 
-unsigned int ID;
+constexpr unsigned int texture_count = 8;
+unsigned int textures[texture_count];
 
 static GLfloat quad_vertices[8][3] =
 {
@@ -60,18 +61,18 @@ static void getNormal3p
 
 void LoadTexture(const char* const filename, unsigned int& const ID)
 {
-	glGenTextures(1, &ID);
 	glBindTexture(GL_TEXTURE_2D, ID);
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, ID);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 	BMPLoader bmp(filename);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, bmp.m_Width, bmp.m_Height, 0, GL_BGR_EXT, GL_UNSIGNED_BYTE, bmp.m_Data);
 	gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGB, bmp.m_Width, bmp.m_Height, GL_BGR_EXT, GL_UNSIGNED_BYTE, bmp.m_Data);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 }
 
 void drawBox()
@@ -217,17 +218,16 @@ int main(int argc, char* argv[])
 	glutCreateWindow("Lab-3: Textures");
 
 	glShadeModel(GL_SMOOTH);
+
 	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+
 	glEnable(GL_NORMALIZE);
-
-	//glEnable(GL_CULL_FACE);
-	//glCullFace(GL_FRONT);
-
 	glEnable(GL_LIGHTING);
-	glEnable(GL_TEXTURE_2D);
 
-	LoadTexture("brick.bmp", ID);
-	//LoadTexture("wood.bmp", ID2);
+	glGenTextures(texture_count, textures);
+	LoadTexture("wood.bmp", textures[0]);
+	LoadTexture("brick.bmp", textures[1]);
 	//light();
 
 	std::cout << "OpenGL Vendor:   " << glGetString(GL_VENDOR) << std::endl;
