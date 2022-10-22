@@ -224,17 +224,19 @@ void draw_floor()
 	GLfloat wall_height = 25.0f;
 
 	// Draw the floor
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textures[0]);
 	glPushMatrix();
 	glScalef(floor_width + thickness / 2, thickness, floor_depth);
 	glTranslatef(0.0f, -wall_height / thickness, 0.0f);
-	draw_cube(r, g, b);
+	draw_textured_cube();
 	glPopMatrix();
 
 	// Draw the roof
 	glPushMatrix();
 	glScalef(floor_width + thickness / 2, thickness, floor_depth);
 	glTranslatef(0.0f, wall_height / thickness, 0.0f);
-	draw_cube(r, g, b);
+	draw_textured_cube();
 	glPopMatrix();
 }
 

@@ -226,7 +226,7 @@ int main(int argc, char* argv[])
 	glEnable(GL_LIGHTING);
 
 	glGenTextures(texture_count, textures);
-	LoadTexture("wood.bmp", textures[0]);
+	LoadTexture("spre.bmp", textures[0]);
 	LoadTexture("brick.bmp", textures[1]);
 	//light();
 
