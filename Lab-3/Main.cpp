@@ -59,7 +59,7 @@ static void getNormal3p
 	glNormal3f(Nx, Ny, Nz);
 }
 
-void LoadTexture(const char* const filename, unsigned int& const ID)
+void LoadTexture(const char* filename, unsigned int& ID)
 {
 	glBindTexture(GL_TEXTURE_2D, ID);
 
@@ -153,7 +153,7 @@ void display(void)
 	glutSwapBuffers();
 }
 
-void myKeyboardFunc(const unsigned char const key, const int const x, const int const y)
+void myKeyboardFunc(const unsigned char key, const int x, const int y)
 {
 	switch (key)
 	{
@@ -173,11 +173,11 @@ void myKeyboardFunc(const unsigned char const key, const int const x, const int 
 		axis_y = 0.0;
 		break;
 	case '+':
-		Tzval += 0.2;
+		Tzval += 0.2f;
 		break;
 
 	case '-':
-		Tzval -= 0.2;
+		Tzval -= 0.2f;
 		break;
 
 	case 27:	// Escape key
@@ -191,16 +191,16 @@ void animate()
 {
 	if (bRotate == true)
 	{
-		theta += 0.2;
-		if (theta > 360.0)
-			theta -= 360.0 * floor(theta / 360.0);
+		theta += 0.2f;
+		if (theta > 360.0f)
+			theta -= 360.0f * floor(theta / 360.0f);
 	}
 
 	if (uRotate == true)
 	{
-		alpha += 0.2;
-		if (alpha > 360.0)
-			alpha -= 360.0 * floor(alpha / 360.0);
+		alpha += 0.2f;
+		if (alpha > 360.0f)
+			alpha -= 360.0f * floor(alpha / 360.0f);
 	}
 	glutPostRedisplay();
 }

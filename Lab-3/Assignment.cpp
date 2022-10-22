@@ -247,7 +247,7 @@ void draw_door()
 	glBindTexture(GL_TEXTURE_2D, textures[2]);
 	glPushMatrix();
 	glScalef(5.0f, 10.0f, 0.15f);
-	glTranslatef(0.0f, (-25.0 / 10.0) + 1, -25.0 / 0.15 + 1);
+	glTranslatef(0.0f, (-25.0f / 10.0f) + 1, -25.0f / 0.15f + 1);
 	draw_textured_cube();
 	glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
@@ -257,7 +257,7 @@ void draw_door()
 	glBindTexture(GL_TEXTURE_2D, textures[7]);
 	glPushMatrix();
 	glScalef(2.25f, 10.0f, 0.15f);
-	glTranslatef(-1.125, (-25.0 / 10.0) + 1, -25.0 / 0.15 + 1.15);
+	glTranslatef(-1.125f, (-25.0f / 10.0f) + 1, -25.0f / 0.15f + 1.15f);
 	draw_textured_cube();
 	glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
@@ -267,7 +267,7 @@ void draw_door()
 	glBindTexture(GL_TEXTURE_2D, textures[7]);
 	glPushMatrix();
 	glScalef(2.25f, 10.0f, 0.15f);
-	glTranslatef(1.125f, (-25.0 / 10.0) + 1, -25.0 / 0.15 + 1.15);
+	glTranslatef(1.125f, (-25.0f / 10.0f) + 1, -25.0f / 0.15f + 1.15f);
 	draw_textured_cube();
 	glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
@@ -373,7 +373,7 @@ void draw_bed()
 	glDisable(GL_TEXTURE_2D);
 
 	// bed
-	GLfloat bed_length = 15.0f, bed_width = bed_position / 2 + 0.5, bed_thickness = 1.0f;
+	GLfloat bed_length = 15.0f, bed_width = bed_position / 2 + 0.5f, bed_thickness = 1.0f;
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, textures[7]);
 	glPushMatrix();
@@ -394,7 +394,7 @@ void draw_bed()
 	glScalef(bed_length, bed_thickness, bed_width);
 	glTranslatef(
 		(-corner_distance + bed_length) / bed_length,
-		(-room_height + bed_thickness) + (leg_height + (leg_height / 2) + 1.0 * 2),
+		(-room_height + bed_thickness) + (leg_height + (leg_height / 2) + 1.0f * 2),
 		(bed_position / 2) / bed_width
 	);
 	draw_textured_cube();
@@ -405,10 +405,10 @@ void draw_bed()
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, textures[5]);
 	glPushMatrix();
-	glScalef(bed_length / 2, 1.0f, bed_width + 0.1);
+	glScalef(bed_length / 2, 1.0f, bed_width + 0.1f);
 	glTranslatef(
 		-1,
-		(-room_height + bed_thickness) + (leg_height + (leg_height / 2) + 1.0 * 3),
+		(-room_height + bed_thickness) + (leg_height + (leg_height / 2) + 1.0f * 3),
 		(bed_position / 2) / bed_width
 	);
 	draw_textured_cube();
@@ -422,7 +422,7 @@ void draw_bed()
 	glScalef(bed_length / 5, bed_thickness, bed_width / 2);
 	glTranslatef(
 		(-corner_distance + (bed_length / 5)) / (bed_length / 5),
-		(-room_height + bed_thickness) + (leg_height + (leg_height / 2) + 1.0 * 3),
+		(-room_height + bed_thickness) + (leg_height + (leg_height / 2) + 1.0f * 3),
 		(bed_position / 2) / (bed_width / 2)
 	);
 	draw_textured_cube();
@@ -792,7 +792,7 @@ static void pitch()
 	if (pitch_angle > 179.0f) pitch_angle = 179.0f;
 	if (pitch_angle < -179.0f) pitch_angle = -179.0f;
 
-	lookX = eyeX * (cos(pitch_angle * static_cast<GLfloat>(std::numbers::pi) / 180.0));
+	lookX = eyeX * (cos(pitch_angle * static_cast<GLfloat>(std::numbers::pi) / 180.0f));
 }
 
 static void yaw()
@@ -801,7 +801,7 @@ static void yaw()
 	if (yaw_angle > 179.0f) yaw_angle = 179.0f;
 	if (yaw_angle < 1.0f) yaw_angle = 1.0f;
 
-	lookY = eyeY * (cos(yaw_angle * static_cast<GLfloat>(std::numbers::pi) / 180.0));
+	lookY = eyeY * (cos(yaw_angle * static_cast<GLfloat>(std::numbers::pi) / 180.0f));
 }
 
 void roll() // z axis
@@ -810,8 +810,8 @@ void roll() // z axis
 	if (roll_angle > 269.0f) roll_angle = 269.0f;
 	if (roll_angle < -89.0f) roll_angle = -89.0f;
 
-	upX = eyeX * (cos(roll_angle * static_cast<GLfloat>(std::numbers::pi) / 180.0));
-	upY = eyeY * (sin(roll_angle * static_cast<GLfloat>(std::numbers::pi) / 180.0));
+	upX = eyeX * (cos(roll_angle * static_cast<GLfloat>(std::numbers::pi) / 180.0f));
+	upY = eyeY * (sin(roll_angle * static_cast<GLfloat>(std::numbers::pi) / 180.0f));
 }
 
 void keyboard_func(unsigned char key, int x, int y)
