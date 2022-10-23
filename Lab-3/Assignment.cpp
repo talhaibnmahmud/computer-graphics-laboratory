@@ -59,7 +59,7 @@ static void draw_sphere(GLfloat r, GLfloat g, GLfloat b)
 	GLfloat mat_ambient[] = { r, g, b, 1.0 };
 	GLfloat mat_diffuse[] = { r, g, b, 1.0 };
 	GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-	GLfloat mat_shininess[] = { 90 };
+	GLfloat mat_shininess[] = { 100 };
 
 	glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
 	glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
@@ -67,8 +67,8 @@ static void draw_sphere(GLfloat r, GLfloat g, GLfloat b)
 	glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
 
 	glPushMatrix();
-	glTranslatef(3.5, -5.25, 4.5);
-	glutSolidSphere(0.75l, 20, 16);
+	glTranslatef(30.0f - 5.0f, -25.0f + 5.0f, 0.0f);
+	glutSolidSphere(5.0l, 25, 16);
 	glPopMatrix();
 }
 
@@ -612,20 +612,20 @@ void draw_laptop()
 {
 	// laptop base
 	glPushMatrix();
-	glTranslatef(3.75f, -3.5f, 1.7f);
+	glTranslatef(3.75f, -1.0f, 1.7f);
 	glScalef(1.0f, 0.01f, 1.0f);
 	draw_cube(0.0f, 0.0f, 0.0f);
 	glPopMatrix();
 
 	// laptop front
 	glPushMatrix();
-	glTranslatef(4.75f, -3.5f, 1.7f);
+	glTranslatef(4.75f, 0.0f, 1.7f);
 	glScalef(0.01f, 1.0f, 1.0f);
 	draw_cube(0.0f, 0.0f, 0.0f);
 	glPopMatrix();
 	// laptop display
 	glPushMatrix();
-	glTranslatef(4.74f, -3.45f, 1.75f);
+	glTranslatef(4.74f, 0.0f, 1.75f);
 	glScalef(0.01f, 0.9f, 0.9f);
 	draw_cube(1.0f, 1.0f, 1.0f);
 	glPopMatrix();
@@ -633,13 +633,13 @@ void draw_laptop()
 
 void draw_fan()
 {
-	GLfloat r = 1.0f, g = 1.0f, b = 1.0f;
+	GLfloat r = 0.0f, g = 1.0f, b = 1.0f;
 
 	// fan base
 	glPushMatrix();
-	glTranslatef(0.0, -1.0, 0.0);
-	glScalef(0.2f, 1.0f, 0.2f);
-	draw_cube(r, g, b);
+	glScalef(0.2f, 3.0f, 0.2f);
+	glTranslatef(0.0f, 25.0f / 3.0f - 1.0f, 0.0f);
+	draw_cube(1.0f, 1.0f, 1.0f);
 	glPopMatrix();
 
 	r = 0.7f, g = 0.4f, b = 0.4f;
@@ -647,7 +647,7 @@ void draw_fan()
 	// fan blades
 	glPushMatrix();
 	glRotatef(theta_fan_rotate, 0.0f, 1.0f, 0.0f);
-	glTranslatef(0.0f, -1.0f, 0.0f);
+	glTranslatef(0.0f, 25.0f - 6.0f, 0.0f);
 	glScalef(0.4f, 0.4f, 0.4f);
 
 	/*for (int i = 0; i < 180; i++) {
@@ -659,7 +659,7 @@ void draw_fan()
 		glPopMatrix();
 	}*/
 
-	GLfloat scale_x = 4.5f, scale_y = 0.3f, scale_z = 1.75f;
+	GLfloat scale_x = 25.0f, scale_y = 0.3f, scale_z = 2.5f;
 
 	glPushMatrix();
 	glScalef(scale_x, scale_y, scale_z);
@@ -690,13 +690,19 @@ void draw_scene()
 	draw_bed();
 	draw_table();
 	draw_chair();
-	//draw_laptop();
+	
+	glPushMatrix();
+	glTranslatef(20.0f, -13.5f, 13.5f);
+	draw_laptop();
+	glPopMatrix();
 
 	// draw the sphere
-	//draw_sphere(0.415f, 0.051f, 0.675f);
+	glPushMatrix();
+	draw_sphere(0.415f, 0.051f, 0.675f);
+	glPopMatrix();
 
 	// draw the fan
-	//draw_fan();
+	draw_fan();
 }
 
 static void light(
