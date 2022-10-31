@@ -8,6 +8,10 @@ import Settings;
 #include <iostream>
 #include <string>
 
+// Textures
+constexpr auto texture_count = 16;
+extern std::array<unsigned int, texture_count> textures;
+
 
 namespace Scene {
 	// Global Variables
@@ -40,6 +44,25 @@ namespace Scene {
 	// Placements testing
 	GLfloat x = 0.0f, y = 0.0f, z = 0.0f;
 
+	// Random Variables
+	int wired = 0;
+	int animat = 0;
+	const int nt = 40;				//number of slices along x-direction
+	const int ntheta = 100;
+
+	const int L = 5;
+	GLfloat ctrlpoints[L + 1][3] =
+	{
+		{ 0.0, 0.0, 0.0},
+		{ 0.0, 0.54, 0.0},
+		{ 0.0, 1.01, 0.0},
+		{ 0.54, 1.01, 0.0},
+		{ 0.55, 0.55, 0.0},
+		{ 0.55, 0.0, 0.0}
+	};
+	
+	GLdouble modelview[16]; //var to hold the modelview info
+
 	static void GetNormal3f(
 		GLfloat x1, GLfloat y1, GLfloat z1,
 		GLfloat x2, GLfloat y2, GLfloat z2,
@@ -60,6 +83,28 @@ namespace Scene {
 		Nz = Ux * Vy - Uy * Vx;
 
 		glNormal3f(Nx, Ny, Nz);
+	}
+	
+	static void setNormal(
+		GLfloat x1, GLfloat y1, GLfloat z1, 
+		GLfloat x2, GLfloat y2, GLfloat z2, 
+		GLfloat x3, GLfloat y3, GLfloat z3)
+	{
+		GLfloat Ux, Uy, Uz, Vx, Vy, Vz, Nx, Ny, Nz;
+
+		Ux = x2 - x1;
+		Uy = y2 - y1;
+		Uz = z2 - z1;
+
+		Vx = x3 - x1;
+		Vy = y3 - y1;
+		Vz = z3 - z1;
+
+		Nx = Uy * Vz - Uz * Vy;
+		Ny = Uz * Vx - Ux * Vz;
+		Nz = Ux * Vy - Uy * Vx;
+
+		glNormal3f(-Nx, -Ny, -Nz);
 	}
 
 	static GLfloat quad_vertices[8][3] =
@@ -88,7 +133,7 @@ namespace Scene {
 	// Draw Cube
 	static void Cube(float R = 255, float G = 255, float B = 255, float alpha = 1)
 	{
-		float r = R / 255, g = G / 255, b = B / 255;
+		float r = R / 255.0f, g = G / 255.0f, b = B / 255.0f;
 
 		GLfloat no_mat[] = { 0.0, 0.0, 0.0, 1.0 };
 		GLfloat mat_ambient[] = { r, g, b, 1.0 };
@@ -129,54 +174,240 @@ namespace Scene {
 		glEnd();
 	}
 
+	static long long nCr(int n, int r)
+	{
+		if (r > n / 2) r = n - r; // because C(n, r) == C(n, n - r)
+		long long ans = 1;
+		int i;
+
+		for (i = 1; i <= r; i++)
+		{
+			ans *= n - r + i;
+			ans /= i;
+		}
+
+		return ans;
+	}
+
+	static void BezierCurve(double t, float xy[2])
+	{
+		double y = 0;
+		double x = 0;
+		t = t > 1.0 ? 1.0 : t;
+		for (int i = 0; i <= L; i++)
+		{
+			int ncr = nCr(L, i);
+			double oneMinusTpow = pow(1 - t, double(L - i));
+			double tPow = pow(t, double(i));
+			double coef = oneMinusTpow * tPow * ncr;
+			x += coef * ctrlpoints[i][0];
+			y += coef * ctrlpoints[i][1];
+
+		}
+		xy[0] = float(x);
+		xy[1] = float(y);
+	}
+	
+	static void MinarCircleBezier()
+	{
+		int i, j;
+		float x, y, z, r;				//current coordinates
+		float x1, y1, z1, r1;			//next coordinates
+		float theta;
+
+		const float startx = 0, endx = ctrlpoints[L][0];
+		//number of angular slices
+		const float dx = (endx - startx) / nt;	//x step size
+		const float dtheta = 2 * 3.1416 / ntheta;		//angular step size
+
+		float t = 0;
+		float dt = 1.0 / nt;
+		float xy[2];
+		BezierCurve(t, xy);
+		x = xy[0];
+		r = xy[1];
+		//rotate about z-axis
+		float p1x = 0.0, p1y = 0.0, p1z = 0.0, p2x = 0.0, p2y = 0.0, p2z = 0.0;
+		for (i = 0; i < nt; ++i)  			//step through x
+		{
+			theta = 0;
+			t += dt;
+			BezierCurve(t, xy);
+			x1 = xy[0];
+			r1 = xy[1];
+
+			//draw the surface composed of quadrilaterals by sweeping theta
+			glBegin(GL_QUAD_STRIP);
+			for (j = 0; j <= ntheta; ++j)
+			{
+				theta += dtheta;
+				double cosa = cos(theta);
+				double sina = sin(theta);
+				y = r * cosa;
+				y1 = r1 * cosa;	//current and next y
+				z = r * sina;
+				z1 = r1 * sina;	//current and next z
+
+				//edge from point at x to point at next x
+				glVertex3f(x, y, z);
+
+				if (j > 0)
+				{
+					setNormal(p1x, p1y, p1z, p2x, p2y, p2z, x, y, z);
+				}
+				else
+				{
+					p1x = x;
+					p1y = y;
+					p1z = z;
+					p2x = x1;
+					p2y = y1;
+					p2z = z1;
+
+				}
+				glVertex3f(x1, y1, z1);
+
+				//forms quad with next pair of points with incremented theta value
+			}
+			glEnd();
+			x = x1;
+			r = r1;
+		} //for i
+	}
+	
+	static void Curve()
+	{
+		const double t = glutGet(GLUT_ELAPSED_TIME) / 5000.0;
+		const double a = t * 90.0;
+
+		// glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		if (wired)
+		{
+			glPolygonMode(GL_FRONT, GL_LINE);
+			glPolygonMode(GL_BACK, GL_LINE);
+
+		}
+		else
+		{
+			glPolygonMode(GL_FRONT, GL_FILL);
+			glPolygonMode(GL_BACK, GL_FILL);
+		}
+
+		glPushMatrix();
+
+		if (animat)
+			glRotated(a, 0, 0, 1);
+
+		//glRotatef(anglex, 1.0, 0.0, 0.0);
+		//glRotatef(angley, 0.0, 1.0, 0.0);         	//rotate about y-axis
+		//glRotatef(anglez, 0.0, 0.0, 1.0);
+
+		glRotatef(90, 0.0, 0.0, 1.0);
+		glTranslated(-3.5, 0, 0);
+		glGetDoublev(GL_MODELVIEW_MATRIX, modelview); //get the modelview info
+
+		// void matColor(float kdr, float kdg, float kdb,  float shiny, int frnt_Back=0, float ambFactor=1.0, float specFactor=1.0);
+
+		//  matColor(0.9,0.5,0.1,20);   // front face color
+		// matColor(0.0,0.5,0.8,20,1);  // back face color
+
+		glPushMatrix();
+		// glRotatef(90,0,1,0);
+		// glScalef(0.5,1,0.5);
+		MinarCircleBezier();
+		glPopMatrix();
+
+		/*if (shcpt)
+		{
+			matColor(0.0, 0.0, 0.9, 20);
+			showControlPoints();
+		}*/
+
+		glPopMatrix();
+	}
+
+	// Texture Enum to Texture ID
+	enum Textures
+	{
+		earth,
+		water,
+		cloud_sky,
+		green_grass,
+		black_road,
+		red_brick,
+		white_wall,
+		wood,
+		floor,
+		roof_tile
+	};
+
 	// Drawing Earth
 	static void DrawEarth()
 	{
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, textures[earth]);
 		glPushMatrix();
 		glScalef(100000, 1, 100000);
-		Cube(139, 69, 19);  //165, 42, 42
+		Cube();  //165, 42, 42
 		glPopMatrix();
+		glDisable(GL_TEXTURE_2D);
 	}
 
 	static void Grass()
 	{
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, textures[Textures::green_grass]);
 		glPushMatrix();
 		glScalef(250, 5, 250);
-		Cube(0, 255, 0);
+		Cube();
 		glPopMatrix();
+		glDisable(GL_TEXTURE_2D);
 	}
 
 	static void Pond()
 	{
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, textures[Textures::water]);
 		glPushMatrix();
 		glTranslatef(-355, 0, 0);
 		glScalef(200, 5, 252);
-		Cube(255, 255, 255);
+		Cube();
 		glPopMatrix();
+		glDisable(GL_TEXTURE_2D);
 	}
 
 	static void Base()
 	{
 		// 1st Base
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, textures[Textures::red_brick]);
 		glPushMatrix();
 		glTranslatef(-100, 7, -141.5);
 		glScalef(100, 5, 150);
-		Cube(128, 0, 0);
+		Cube(255, 255, 255);
 		glPopMatrix();
+		glDisable(GL_TEXTURE_2D);
 
 		// 2nd Base
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, textures[Textures::red_brick]);
 		glPushMatrix();
 		glTranslatef(-98, 17, -141.5);
 		glScalef(96, 5, 142);
-		Cube(40, 40, 40);
+		Cube(127, 127, 127);
 		glPopMatrix();
+		glDisable(GL_TEXTURE_2D);
 
 		// 3rd Base
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, textures[Textures::red_brick]);
 		glPushMatrix();
 		glTranslatef(-96, 27, -141.5);
 		glScalef(90, 5, 132);
-		Cube(128, 10, 10);
+		Cube(255, 255, 255);
 		glPopMatrix();
+		glDisable(GL_TEXTURE_2D);
 	}
 
 	static void Floors()
@@ -200,19 +431,21 @@ namespace Scene {
 
 	static void Road()
 	{
-		//glBindTexture(GL_TEXTURE_2D, ID[floor4]);
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, textures[Textures::black_road]);
 		glPushMatrix();
 		glTranslatef(100, 5.5, -50);
 		glScalef(75, 1, 35);
-		Cube(165, 42, 42);
+		Cube();
 		glPopMatrix();
+		glDisable(GL_TEXTURE_2D);
 
 		//glBindTexture(GL_TEXTURE_2D, ID[white]);
 
 		glPushMatrix();
 		glTranslatef(100, 8, -50);
 		glScalef(75, 1, 3);
-		Cube(255, 255, 255);
+		Cube();
 		glPopMatrix();
 
 		//glPushMatrix();
@@ -230,8 +463,8 @@ namespace Scene {
 
 	static void MinarBase()
 	{
-		//glBindTexture(GL_TEXTURE_2D, ID[white]);
-
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, textures[white_wall]);
 		glPushMatrix();							//minar Right
 		glTranslatef(-70, 35, -15);
 		glScalef(3, 60, 3);
@@ -249,15 +482,14 @@ namespace Scene {
 		glScalef(3, 2, 18);
 		Cube(255, 255, 255);
 		glPopMatrix();
+		glDisable(GL_TEXTURE_2D);
 
-		//glBindTexture(GL_TEXTURE_2D, ID[black]);
 		glPushMatrix();							// Minar Middle Column (Right)
 		glTranslatef(-68, 35, -2);
 		glScalef(0.8, 59, 0.8);
 		Cube(255, 255, 255);
 		glPopMatrix();
 
-		//glBindTexture(GL_TEXTURE_2D, ID[black]);
 		glPushMatrix();							// Minar Middle Column (Left)
 		glTranslatef(-68, 35, 6);
 		glScalef(0.8, 59, 0.8);
@@ -301,25 +533,26 @@ namespace Scene {
 
 	static void MinarUpperBase()
 	{
-		//glBindTexture(GL_TEXTURE_2D, ID[white]);
-
-		glPushMatrix();  //minar base1
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, textures[white_wall]);
+		glPushMatrix();											//minar base1
 		glTranslatef(-70, 35, -15);
 		glScalef(3, 30, 3);
 		Cube(255, 255, 255);
 		glPopMatrix();
 
-		glPushMatrix();//minar base2
+		glPushMatrix();											//minar base2
 		glTranslatef(-70, 35, 15);
 		glScalef(3, 30, 3);
 		Cube(255, 255, 255);
 		glPopMatrix();
 
-		glPushMatrix();										//minar upper base
+		glPushMatrix();											//minar upper base
 		glTranslatef(-70, 65, 0);
 		glScalef(3, 2, 18);
 		Cube(255, 255, 255);
 		glPopMatrix();
+		glDisable(GL_TEXTURE_2D);
 
 		//  glBindTexture(GL_TEXTURE_2D, ID[black]);
 		glPushMatrix();//minar thin_base1
@@ -369,16 +602,17 @@ namespace Scene {
 		MinarSmall();
 		glPopMatrix();
 
-		//glEnable(GL_COLOR_MATERIAL);
-		////glBindTexture(GL_TEXTURE_2D, ID[red]);
-		//glPushMatrix();
-		//glColor3f(1, 0, 0);
-		//glTranslatef(-130, 90, 0);
-		//glRotatef(85, 0, 0, 1);
-		//glScalef(95, 5, 95);               //curve-------------------------
-		//curve();
-		//glPopMatrix();
-		//glColor3f(1, 1, 1);
+		glEnable(GL_COLOR_MATERIAL);
+		//glBindTexture(GL_TEXTURE_2D, ID[red]);
+		glPushMatrix();
+		glColor3f(1, 0, 0);
+		glTranslatef(-130, 90, 0);
+		glRotatef(85, 0, 0, 1);
+		glScalef(95, 5, 95);               // Circle
+		Curve();
+		glPopMatrix();
+		glColor3f(1, 1, 1);
+		glDisable(GL_COLOR_MATERIAL);
 	}
 
 	static void ShahidMinar()
@@ -436,11 +670,11 @@ namespace Scene {
 		{7,4,0,3},
 	};
 	
-	static void DrawCube(GLint c1, GLint c2, GLint c3, GLboolean emission = false)
+	static void DrawCube(GLint R = 255, GLint G = 255, GLint B = 255, GLboolean emission = false)
 	{
-		GLfloat r = c1 / 255.0;
-		GLfloat g = c2 / 255.0;
-		GLfloat b = c3 / 255.0;
+		GLfloat r = R / 255.0f;
+		GLfloat g = G / 255.0f;
+		GLfloat b = B / 255.0f;
 
 		GLfloat no_mat[] = { 0.0, 0.0, 0.0, 1.0 };
 		GLfloat mat_ambient[] = { r, g, b, 1.0 };
@@ -448,7 +682,7 @@ namespace Scene {
 		GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
 		GLfloat mat_shininess[] = { 60 };
 
-		GLfloat mat_em[] = { r,g,b,1.0 };
+		GLfloat mat_em[] = { r, g, b, 1.0 };
 
 		glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
 		glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
@@ -720,42 +954,42 @@ namespace Scene {
 		glTranslatef(0, 10, -20);
 		glRotatef(180, 0, 1, 0);
 		glScalef(.5, 5, .1);
-		DrawCube(173, 123, 7);
+		DrawCube();
 		glPopMatrix();
 
 		glPushMatrix();
 		glTranslatef(0, 4 * 2.5, -20);
 		glRotatef(180, 0, 1, 0);
 		glScalef(4, 0.5, .1);
-		DrawCube(173, 123, 7);
+		DrawCube();
 		glPopMatrix();
 
 		glPushMatrix();
 		glTranslatef(-4, 10, -20);
 		glRotatef(180, 0, 1, 0);
 		glScalef(.5, 5, .3);
-		DrawCube(173, 123, 7);
+		DrawCube();
 		glPopMatrix();
 
 		glPushMatrix();
 		glTranslatef(4, 10, -20);
 		glRotatef(180, 0, 1, 0);
 		glScalef(.5, 5, .3);
-		DrawCube(173, 123, 7);
+		DrawCube();
 		glPopMatrix();
 
 		glPushMatrix();
 		glTranslatef(0, 5 * 3, -20);
 		glRotatef(180, 0, 1, 0);
 		glScalef(4.9, 0.5, .3);
-		DrawCube(173, 123, 7);
+		DrawCube();
 		glPopMatrix();
 
 		glPushMatrix();
 		glTranslatef(0, 1.5 * 3, -20);
 		glRotatef(180, 0, 1, 0);
 		glScalef(4.9, 0.5, .3);
-		DrawCube(173, 123, 7);
+		DrawCube();
 		glPopMatrix();
 	}
 	
@@ -780,28 +1014,32 @@ namespace Scene {
 	
 	static void Roof()
 	{
-
 		glPushMatrix();
 		glTranslatef(0, 40.2, 1);
 		glScalef(64, .4, 22);
 		DrawCube(166, 166, 166);
 		glPopMatrix();
 
-
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, textures[roof_tile]);
 		glPushMatrix();
 		glTranslatef(-5, 41, 5);
 		glScalef(70, .6, 30);
 		DrawCube(66, 66, 66);
 		glPopMatrix();
+		glDisable(GL_TEXTURE_2D);
 	}
 	
 	static void FloorBase()
 	{
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, textures[floor]);
 		glPushMatrix();
 		glTranslatef(-5, 0, 5);
 		glScalef(66, .5, 30);
-		DrawCube(255, 255, 255);
+		DrawCube();
 		glPopMatrix();
+		glDisable(GL_TEXTURE_2D);
 
 		glPushMatrix();
 		glTranslatef(-5, -5.5, 5);
@@ -844,28 +1082,36 @@ namespace Scene {
 	static void DrawRoom()
 	{
 		///frontwalls
+		
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, textures[red_brick]);
+		
 		//front leftwall
 		glPushMatrix();
 		glTranslatef(-12, 10, 20);
 		glScalef(8, 10, .2);
-		DrawCube(149, 146, 140);
+		DrawCube();
 		glPopMatrix();
+		
 		//front rightwall
 		glPushMatrix();
 		glTranslatef(12, 10, 20);
 		glScalef(8, 10, .2);
-		DrawCube(149, 146, 140);
+		DrawCube();
 		glPopMatrix();
 
 		//front topwall
 		glPushMatrix();
 		glTranslatef(0, 17, 20);
 		glScalef(4, 3, .2);
-		DrawCube(149, 146, 140);
+		DrawCube();
 		glPopMatrix();
+		
+		glDisable(GL_TEXTURE_2D);
 
 
 		///front Door
+		
 		//door frame
 		glPushMatrix();
 		glTranslatef(4.1, 7, 20);
@@ -946,11 +1192,14 @@ namespace Scene {
 		}
 		glPopMatrix();
 
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, textures[red_brick]);
+		
 		//left wall
 		glPushMatrix();
 		glTranslatef(-20, 10, 0);
 		glScalef(.1, 10, 20);
-		DrawCube(104, 139, 153);
+		DrawCube();
 		glPopMatrix();
 
 		//right wall
@@ -965,7 +1214,7 @@ namespace Scene {
 		glTranslatef(-12, 10, -20);
 		glRotatef(180, 0, 1, 0);
 		glScalef(8, 10, .1);
-		DrawCube(104 - 25, 139 - 25, 153 - 25);
+		DrawCube();
 		glPopMatrix();
 
 		//backwall right
@@ -973,7 +1222,7 @@ namespace Scene {
 		glTranslatef(12, 10, -20);
 		glRotatef(180, 0, 1, 0);
 		glScalef(8, 10, .1);
-		DrawCube(104 - 25, 139 - 25, 153 - 25);
+		DrawCube();
 		glPopMatrix();
 
 
@@ -982,7 +1231,7 @@ namespace Scene {
 		glTranslatef(0, 2.5, -20);
 		glRotatef(180, 0, 1, 0);
 		glScalef(4, 2.5, .1);
-		DrawCube(104 - 25, 139 - 25, 153 - 25);
+		DrawCube();
 		glPopMatrix();
 
 		//backwall top
@@ -990,12 +1239,17 @@ namespace Scene {
 		glTranslatef(0, 17.5, -20);
 		glRotatef(180, 0, 1, 0);
 		glScalef(4, 2.5, .1);
-		DrawCube(104 - 25, 139 - 25, 153 - 25);
+		DrawCube();
 		glPopMatrix();
+		
+		glDisable(GL_TEXTURE_2D);
 
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, textures[wood]);
 		glPushMatrix();
 		WindowFrame();
 		glPopMatrix();
+		glDisable(GL_TEXTURE_2D);
 
 		//bathroom
 		glPushMatrix();
@@ -1194,130 +1448,6 @@ namespace Scene {
 		glPopMatrix();
 	}
 	
-	//static void Stair()
-	//{
-	//	//halfway base
-	//	glPushMatrix();
-	//	glTranslatef(-65, 10, -16);
-	//	glScalef(7, .5, 4);
-	//	DrawCube(244, 201, 105);
-	//	glPopMatrix();
-
-	//	//stairs top
-	//	glPushMatrix();
-	//	glTranslatef(-61.5, 10.5, -11);
-	//	glScalef(3.5, .75, 2.5);
-	//	DrawCube(255, 255, 255);
-	//	glPopMatrix();
-
-	//	glPushMatrix();
-	//	glTranslatef(-61.5, 11.5, -7);
-	//	glScalef(3.5, .75, 2.5);
-	//	DrawCube(255, 255, 255);
-	//	glPopMatrix();
-
-	//	glPushMatrix();
-	//	glTranslatef(-61.5, 12.5, -3);
-	//	glScalef(3.5, .75, 2.5);
-	//	DrawCube(255, 255, 255);
-	//	glPopMatrix();
-
-	//	glPushMatrix();
-	//	glTranslatef(-61.5, 13.5, 1);
-	//	glScalef(3.5, .75, 2.5);
-	//	DrawCube(255, 255, 255);
-	//	glPopMatrix();
-
-	//	glPushMatrix();
-	//	glTranslatef(-61.5, 14.5, 5);
-	//	glScalef(3.5, .75, 2.5);
-	//	DrawCube(255, 255, 255);
-	//	glPopMatrix();
-
-	//	glPushMatrix();
-	//	glTranslatef(-61.5, 15.5, 9);
-	//	glScalef(3.5, .75, 2.5);
-	//	DrawCube(255, 255, 255);
-	//	glPopMatrix();
-	//	glPushMatrix();
-	//	glTranslatef(-61.5, 16.5, 13);
-	//	glScalef(3.5, .75, 2.5);
-	//	DrawCube(255, 255, 255);
-	//	glPopMatrix();
-
-	//	glPushMatrix();
-	//	glTranslatef(-61.5, 17.5, 17);
-	//	glScalef(3.5, .75, 2.5);
-	//	DrawCube(255, 255, 255);
-	//	glPopMatrix();
-
-	//	glPushMatrix();
-	//	glTranslatef(-61.5, 19, 19);
-	//	glScalef(3.5, .75, 2.5);
-	//	DrawCube(255, 255, 255);
-	//	glPopMatrix();
-
-	//	//stairs bottom
-	//	glPushMatrix();
-	//	glTranslatef(-68.5, 9.5, -11);
-	//	glScalef(3.5, .75, 2.5);
-	//	DrawCube(255, 255, 255);
-	//	glPopMatrix();
-
-	//	glPushMatrix();
-	//	glTranslatef(-68.5, 8.5, -7);
-	//	glScalef(3.5, .75, 2.5);
-	//	DrawCube(255, 255, 255);
-	//	glPopMatrix();
-
-	//	glPushMatrix();
-	//	glTranslatef(-68.5, 7.5, -3);
-	//	glScalef(3.5, .75, 2.5);
-	//	DrawCube(255, 255, 255);
-	//	glPopMatrix();
-	//	glPushMatrix();
-	//	glTranslatef(-68.5, 6.5, 1);
-	//	glScalef(3.5, .75, 2.5);
-	//	DrawCube(255, 255, 255);
-	//	glPopMatrix();
-
-	//	glPushMatrix();
-	//	glTranslatef(-68.5, 5.5, 5);
-	//	glScalef(3.5, .75, 2.5);
-	//	DrawCube(255, 255, 255);
-	//	glPopMatrix();
-
-	//	glPushMatrix();
-	//	glTranslatef(-68.5, 4.5, 9);
-	//	glScalef(3.5, .75, 2.5);
-	//	DrawCube(255, 255, 255);
-	//	glPopMatrix();
-
-	//	glPushMatrix();
-	//	glTranslatef(-68.5, 3.5, 13);
-	//	glScalef(3.5, .75, 2.5);
-	//	DrawCube(255, 255, 255);
-	//	glPopMatrix();
-
-	//	glPushMatrix();
-	//	glTranslatef(-68.5, 2.5, 17);
-	//	glScalef(3.5, .75, 2.5);
-	//	DrawCube(255, 255, 255);
-	//	glPopMatrix();
-
-	//	glPushMatrix();
-	//	glTranslatef(-68.5, 1.5, 21);
-	//	glScalef(3.5, .75, 2.5);
-	//	DrawCube(255, 255, 255);
-	//	glPopMatrix();
-
-	//	glPushMatrix();
-	//	glTranslatef(-68.5, 0.5, 25);
-	//	glScalef(3.5, .75, 2.5);
-	//	DrawCube(255, 255, 255);
-	//	glPopMatrix();
-	//}
-	
 	static void FirstFloorFence()
 	{
 		//horizontal lines
@@ -1421,69 +1551,6 @@ namespace Scene {
 			glPopMatrix();
 		}
 	}
-	
-	//static void StairFence()
-	//{
-	//	for (GLint i = 0; i < 14; i++)
-	//	{
-	//		glPushMatrix();
-	//		glTranslatef(-70, 3.5 + i * .75, 25 - i * 3);
-	//		glScalef(.4, 3.2, .4);
-	//		DrawCube(0, 255, 255);
-	//		glPopMatrix();
-	//	}
-
-	//	glPushMatrix();
-	//	glTranslatef(-70, 3.5 + 13 * .75, 25 - 14 * 3 + 1);
-	//	glScalef(.4, 3.2, .4);
-	//	DrawCube(0, 255, 255);
-	//	glPopMatrix();
-	//	glPushMatrix();
-	//	glTranslatef(-70, 3.5 + 13 * .75, 25 - 14 * 3 + 1 - 2);
-	//	glScalef(.4, 3.2, .4);
-	//	DrawCube(0, 255, 255);
-	//	glPopMatrix();
-	//	glPushMatrix();
-	//	glTranslatef(-70, 3.5 + 13 * .75, 25 - 14 * 3 + 1 - 3.5);
-	//	glScalef(.4, 3.2, .4);
-	//	DrawCube(0, 255, 255);
-	//	glPopMatrix();
-
-	//	for (GLint i = 0; i < 5; i++)
-	//	{
-	//		glPushMatrix();
-	//		glTranslatef(-70 + i * 2, 3.5 + 13 * .75, 25 - 14 * 3 + 1 - 3.5);
-	//		glScalef(.4, 3.2, .4);
-	//		DrawCube(0, 255, 255);
-	//		glPopMatrix();
-	//	}
-
-	//	//inclined line
-	//	glPushMatrix();
-	//	glTranslatef(-70, 11.5, 7);
-	//	glRotatef(13.5, 1, 0, 0);
-	//	glScalef(.6, .6, 20);
-	//	DrawCube(50, 50, 50);
-	//	glPopMatrix();
-
-	//	glPushMatrix();
-	//	glTranslatef(-70, 7, 27.4);
-	//	glScalef(.6, .6, 2);
-	//	DrawCube(40, 40, 0);
-	//	glPopMatrix();
-
-	//	glPushMatrix();
-	//	glTranslatef(-70, 16, -15.8);
-	//	glScalef(.6, .6, 4.5);
-	//	DrawCube(40, 40, 40);
-	//	glPopMatrix();
-
-	//	glPushMatrix();
-	//	glTranslatef(-65.0002, 16, -19.4);
-	//	glScalef(5, .6, .6);
-	//	DrawCube(50, 50, 50);
-	//	glPopMatrix();
-	//}
 	
 	static void Building()
 	{
@@ -1593,21 +1660,27 @@ namespace Scene {
 		Buildings();
 		glPopMatrix();
 
+		// Hall Ground
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, textures[Textures::green_grass]);
 		glPushMatrix();
-		//glBindTexture(GL_TEXTURE_2D, ID[grass]);
 		glTranslatef(262.5, 0, 180);
 		glScalef(325, 6, 475); //floor of the hall
-		Cube(0, 255, 0);
+		Cube();
 		glPopMatrix();
+		glDisable(GL_TEXTURE_2D);
 	}
 
 	static void Sky()
 	{
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, textures[Textures::cloud_sky]);
 		glPushMatrix();
 		glTranslatef(0, 1000, 0);
 		glScalef(100000, 0, 100000);
-		DrawCube(135, 206, 235);
+		DrawCube();
 		glPopMatrix();
+		glDisable(GL_TEXTURE_2D);
 	}
 
 	static void Scene()

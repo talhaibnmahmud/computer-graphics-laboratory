@@ -169,6 +169,18 @@
     <ClInclude Include="BMPLoader.h" />
     <ClInclude Include="Scene.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="Images\black-road.bmp" />
+    <Image Include="Images\cloud-sky.bmp" />
+    <Image Include="Images\earth.bmp" />
+    <Image Include="Images\floor.bmp" />
+    <Image Include="Images\green-grass.bmp" />
+    <Image Include="Images\red-brick.bmp" />
+    <Image Include="Images\roof-tile.bmp" />
+    <Image Include="Images\water.bmp" />
+    <Image Include="Images\white-wall.bmp" />
+    <Image Include="Images\wood.bmp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

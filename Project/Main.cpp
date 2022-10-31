@@ -1,11 +1,41 @@
 #include <GL/freeglut.h>
 
+#include <array>
 #include <iostream>
 
 #include "Scene.h"
 
 import Settings;
 import Texture;
+
+// Textures 
+constexpr auto texture_count = 16;
+std::array<unsigned int, texture_count> textures;
+
+// Texture filenames
+std::array<std::string, texture_count> texture_filenames = {
+	"Images\\earth.bmp",
+	"Images\\water.bmp",
+	"Images\\cloud-sky.bmp",
+	"Images\\green-grass.bmp",
+	"Images\\black-road.bmp",
+	"Images\\red-brick.bmp",
+	"Images\\white-wall.bmp",
+	"Images\\wood.bmp",
+	"Images\\floor.bmp",
+	"Images\\roof-tile.bmp"
+};
+
+// Function to load all textures
+void LoadTextures()
+{
+	glGenTextures(texture_count, textures.data());
+
+	for (int i = 0; i < texture_count; i++)
+	{
+		Texture::LoadTexture(texture_filenames[i], textures[i]);
+	}
+}
 
 
 int main(int argc, char* argv[])
@@ -32,6 +62,11 @@ int main(int argc, char* argv[])
 	glEnable(GL_NORMALIZE);
 	//glEnable(GL_COLOR_MATERIAL);
 	glEnable(GL_LIGHTING);
+
+	// Enable Textures
+	glEnable(GL_TEXTURE_2D);
+	// Load textures
+	LoadTextures();
 
 	// Window Handling Functions (Callbacks)
 	glutDisplayFunc(Control::display);

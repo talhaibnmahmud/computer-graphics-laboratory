@@ -39,4 +39,36 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="Images\black-road.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Images\cloud-sky.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Images\earth.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Images\green-grass.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Images\red-brick.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Images\water.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Images\white-wall.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Images\floor.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Images\roof-tile.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Images\wood.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
 </Project>
