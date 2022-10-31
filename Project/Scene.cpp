@@ -410,6 +410,1097 @@ namespace Scene {
 		glPopMatrix();*/
 	}
 
+	
+	static GLfloat cube[8][3] =
+	{
+		{-1.0, -1.0, 1.0},
+		{1.0, -1.0, 1.0},
+		{1.0, 1.0, 1.0},
+		{-1.0, 1.0, 1.0},
+
+
+		{-1.0, -1.0, -1.0},
+		{1.0, -1.0, -1.0},
+		{1.0, 1.0, -1.0},
+		{-1.0, 1.0, -1.0},
+	};
+	static GLubyte quadIndices[6][4] =
+	{
+		{0,1,2,3},
+		{7,6,5,4},
+		{2,6,7,3},
+
+		{0,4,5,1},
+		{2,1,5,6},
+		{7,4,0,3},
+	};
+	
+	static void DrawCube(GLint c1, GLint c2, GLint c3, GLboolean emission = false)
+	{
+		GLfloat r = c1 / 255.0;
+		GLfloat g = c2 / 255.0;
+		GLfloat b = c3 / 255.0;
+
+		GLfloat no_mat[] = { 0.0, 0.0, 0.0, 1.0 };
+		GLfloat mat_ambient[] = { r, g, b, 1.0 };
+		GLfloat mat_diffuse[] = { r, g, b, 1.0 };
+		GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+		GLfloat mat_shininess[] = { 60 };
+
+		GLfloat mat_em[] = { r,g,b,1.0 };
+
+		glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
+		glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
+		glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+		glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+
+		if (emission) glMaterialfv(GL_FRONT, GL_EMISSION, mat_em);
+		else glMaterialfv(GL_FRONT, GL_EMISSION, no_mat);
+
+		for (GLint i = 0; i < 6; i++)
+			for (GLint i = 0; i < 6; i++)
+			{
+				glBegin(GL_QUADS);
+
+				glVertex3fv(&cube[quadIndices[i][0]][0]);
+				glTexCoord2f(1, 1);
+				glVertex3fv(&cube[quadIndices[i][1]][0]);
+				glTexCoord2f(1, 0);
+				glVertex3fv(&cube[quadIndices[i][2]][0]);
+				glTexCoord2f(0, 0);
+				glVertex3fv(&cube[quadIndices[i][3]][0]);
+				glTexCoord2f(0, 1);
+				glEnd();
+			}
+	}
+	
+	static void Cylinder(GLint c1, GLint c2, GLint c3, GLboolean emission = false)
+	{
+
+		GLfloat r = c1 / 255.0;
+		GLfloat g = c2 / 255.0;
+		GLfloat b = c3 / 255.0;
+
+		GLfloat no_mat[] = { 0.0, 0.0, 0.0, 1.0 };
+		GLfloat mat_ambient[] = { r, g, b, 1.0 };
+		GLfloat mat_diffuse[] = { r, g, b, 1.0 };
+		GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+		GLfloat mat_shininess[] = { 60 };
+
+		GLfloat mat_em[] = { r,g,b,1.0 };
+
+		glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
+		glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
+		glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+		glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+
+		if (emission) glMaterialfv(GL_FRONT, GL_EMISSION, mat_em);
+		else glMaterialfv(GL_FRONT, GL_EMISSION, no_mat);
+
+		const double PI = 3.14159;
+
+		/* top triangle */
+		double i, resolution = 0.1;
+		double height = 1;
+		double radius = 0.5;
+
+		glPushMatrix();
+		glTranslatef(0, -0.5, 0);
+		//top Circle
+		glBegin(GL_TRIANGLE_FAN);
+		glTexCoord2f(0.5, 0.5);
+		glVertex3f(0, height, 0);  /* center */
+		for (i = 2 * PI; i >= 0; i -= resolution)
+		{
+			glTexCoord2f(0.5f * cos(i) + 0.5f, 0.5f * sin(i) + 0.5f);
+			glVertex3f(radius * cos(i), height, radius * sin(i));
+		}
+		/* close the loop back to 0 degrees */
+		glTexCoord2f(0.5, 0.5);
+		glVertex3f(radius, height, 0);
+		glEnd();
+
+		//bottom Circle
+		glBegin(GL_TRIANGLE_FAN);
+		glTexCoord2f(0.5, 0.5);
+		glVertex3f(0, 0, 0);  /* center */
+		for (i = 0; i <= 2 * PI; i += resolution)
+		{
+			glTexCoord2f(0.5f * cos(i) + 0.5f, 0.5f * sin(i) + 0.5f);
+			glVertex3f(radius * cos(i), 0, radius * sin(i));
+		}
+		glEnd();
+
+		//cylinder side
+		glBegin(GL_QUAD_STRIP);
+		for (i = 0; i <= 2 * PI; i += resolution)
+		{
+			const float tc = (i / (float)(2 * PI));
+			glTexCoord2f(tc, 0.0);
+			glVertex3f(radius * cos(i), 0, radius * sin(i));
+			glTexCoord2f(tc, 1.0);
+			glVertex3f(radius * cos(i), height, radius * sin(i));
+		}
+		/* close the loop back to zero degrees */
+		glTexCoord2f(0.0, 0.0);
+		glVertex3f(radius, 0, 0);
+		glTexCoord2f(0.0, 1.0);
+		glVertex3f(radius, height, 0);
+		glEnd();
+
+		glPopMatrix();
+	}
+	
+	static void Bed()
+	{
+		//bed
+		//bed floor
+		glPushMatrix();
+		glTranslatef(0, 5, 0);
+		glScalef(5, .2, 10);
+		DrawCube(200, 75, 75);
+		glPopMatrix();
+
+		//bed uporer wall
+		glPushMatrix();
+		glTranslatef(0, 6, -9.9);
+		glScalef(5, 1.2, .1);
+		DrawCube(200, 75, 75);
+		glPopMatrix();
+
+		//bed nicher wall
+		glPushMatrix();
+		glTranslatef(0, 6, 9.9);
+		glScalef(5, .8, .1);
+		DrawCube(200, 75, 75);
+		glPopMatrix();
+		//bed nicher paa
+		glPushMatrix();
+		glTranslatef(4, 3.1, 9);
+		glScalef(.5, 2, .5);
+		DrawCube(255, 255, 255);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(-4, 3.1, 9);
+		glScalef(.5, 2, .5);
+		DrawCube(255, 255, 255);
+		glPopMatrix();
+
+		//bed uporer paa
+		glPushMatrix();
+		glTranslatef(4, 3.1, -8);
+		glScalef(.5, 2, .5);
+		DrawCube(255, 255, 255);
+		glPopMatrix();
+		glPushMatrix();
+		glTranslatef(-4, 3.1, -8);
+		glScalef(.5, 2, .5);
+		DrawCube(255, 255, 255);
+		glPopMatrix();
+
+		//bed uporer mattress
+		glPushMatrix();
+		glTranslatef(0, 5.6, .5);
+		glScalef(4.7, .75, 9.3);
+		DrawCube(255, 255, 255);
+		glPopMatrix();
+
+
+		//blanket
+		glPushMatrix();
+		glTranslatef(0, 5.6 + .75 + .2, 7);
+		glScalef(4.3, .4, 2);
+
+		DrawCube(255, 255, 0);
+		glPopMatrix();
+
+		//pillow
+		glPushMatrix();
+		glTranslatef(-2.1, 5.6 + .75 + .2, -7);
+		glScalef(1.9, .5, 2);
+		DrawCube(255, 0, 255);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(2.1, 5.6 + .75 + .2, -7);
+		glScalef(1.9, .5, 2);
+		DrawCube(255, 0, 255);
+		glPopMatrix();
+	}
+	
+	static void Almirah()
+	{
+		glPushMatrix();
+		glScalef(2, 2, 3.6);
+		glTranslatef(-8.99, 1, 3.9);
+		DrawCube(255, 255, 255);
+		glPopMatrix();
+
+		glPushMatrix();
+		glScalef(1.5, 6, 3.5);
+		glTranslatef(-12.35, 1.5, 4);
+		DrawCube(255, 255, 255);
+		glPopMatrix();
+
+		glPushMatrix();
+		glScalef(2, .5, 3.7);
+		glTranslatef(-9.0, 30, 3.77);
+		DrawCube(255, 255, 255);
+		glPopMatrix();
+
+		//details for racks
+		glPushMatrix();
+		glScalef(.2, 1.5, 1.3);
+		glTranslatef(-16 / .2, 1.4, 12);
+		DrawCube(200, 162, 81);
+		glPopMatrix();
+
+		glPushMatrix();
+		glScalef(.2, 1.5, 1.3);
+		glTranslatef(-16 / .2, 1.4, 9.75);
+		DrawCube(200, 162, 81);
+		glPopMatrix();
+
+		//strips for racks
+		glPushMatrix();
+		glTranslatef(-17, 8, 14);
+		glScalef(.1, 6, .1);
+		DrawCube(200, 180, 161);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(-17, 6, 14);
+		glRotatef(90, 1, 0, 0);
+		glScalef(.1, 3.4, .1);
+		DrawCube(200, 180, 161);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(-17, 8, 14);
+		glRotatef(90, 1, 0, 0);
+		glScalef(.1, 3.4, .1);
+		DrawCube(200, 180, 161);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(-17, 10, 14);
+		glRotatef(90, 1, 0, 0);
+		glScalef(.1, 3.4, .1);
+		DrawCube(200, 180, 161);
+		glPopMatrix();
+		glPushMatrix();
+		glTranslatef(-17, 12, 14);
+		glRotatef(90, 1, 0, 0);
+		glScalef(.1, 3.4, .1);
+		DrawCube(200, 180, 161);
+		glPopMatrix();
+
+		//handles
+		glPushMatrix();
+		glTranslatef(-15.75, 2.5, 13.5);
+		glRotatef(90, 0, 0, 1);
+		glScalef(.8, .15, .25);
+		DrawCube(200, 200, 200);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(-15.75, 2.5, 14.75);
+		glRotatef(90, 0, 0, 1);
+		glScalef(.8, .15, .25);
+		DrawCube(200, 200, 200);
+		glPopMatrix();
+	}
+	
+	static void WindowFrame()
+	{
+		//windowframe
+		glPushMatrix();
+		glTranslatef(0, 10, -20);
+		glRotatef(180, 0, 1, 0);
+		glScalef(.5, 5, .1);
+		DrawCube(173, 123, 7);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(0, 4 * 2.5, -20);
+		glRotatef(180, 0, 1, 0);
+		glScalef(4, 0.5, .1);
+		DrawCube(173, 123, 7);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(-4, 10, -20);
+		glRotatef(180, 0, 1, 0);
+		glScalef(.5, 5, .3);
+		DrawCube(173, 123, 7);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(4, 10, -20);
+		glRotatef(180, 0, 1, 0);
+		glScalef(.5, 5, .3);
+		DrawCube(173, 123, 7);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(0, 5 * 3, -20);
+		glRotatef(180, 0, 1, 0);
+		glScalef(4.9, 0.5, .3);
+		DrawCube(173, 123, 7);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(0, 1.5 * 3, -20);
+		glRotatef(180, 0, 1, 0);
+		glScalef(4.9, 0.5, .3);
+		DrawCube(173, 123, 7);
+		glPopMatrix();
+	}
+	
+	static void Door()
+	{
+		//door
+		glPushMatrix();
+		glTranslatef(0, 7, 20);
+		glScalef(4, 7, .3);
+		DrawCube(183, 159, 127);
+		glPopMatrix();
+	}
+	
+	static void Corridor()
+	{
+		glPushMatrix();
+		glTranslatef(-4, 20, 25.2);
+		glScalef(66, .6, 5);
+		DrawCube(220, 220, 0);
+		glPopMatrix();
+	}
+	
+	static void Roof()
+	{
+
+		glPushMatrix();
+		glTranslatef(0, 40.2, 1);
+		glScalef(64, .4, 22);
+		DrawCube(166, 166, 166);
+		glPopMatrix();
+
+
+		glPushMatrix();
+		glTranslatef(-5, 41, 5);
+		glScalef(70, .6, 30);
+		DrawCube(66, 66, 66);
+		glPopMatrix();
+	}
+	
+	static void FloorBase()
+	{
+		glPushMatrix();
+		glTranslatef(-5, 0, 5);
+		glScalef(66, .5, 30);
+		DrawCube(255, 255, 255);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(-5, -5.5, 5);
+		glScalef(70, 5, 33);
+		DrawCube(55, 55, 55);
+		glPopMatrix();
+
+
+
+		//ground stairs
+		glPushMatrix();
+		glTranslatef(0, 0, 2);
+
+		glPushMatrix();
+		glTranslatef(0, -9.9, 48);
+		glScalef(10, .4, 3);
+		DrawCube(255, 255, 255);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(-0, -8.5, 45);
+		glScalef(10, 1, 3);
+		DrawCube(0, 0, 0);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(-0, -6.5, 42);
+		glScalef(10, 1, 3);
+		DrawCube(255, 255, 255);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(-0, -4.5, 39);
+		glScalef(10, 1, 3);
+		DrawCube(0, 0, 0);
+		glPopMatrix();
+		glPopMatrix();
+	}
+
+	static void DrawRoom()
+	{
+		///frontwalls
+		//front leftwall
+		glPushMatrix();
+		glTranslatef(-12, 10, 20);
+		glScalef(8, 10, .2);
+		DrawCube(149, 146, 140);
+		glPopMatrix();
+		//front rightwall
+		glPushMatrix();
+		glTranslatef(12, 10, 20);
+		glScalef(8, 10, .2);
+		DrawCube(149, 146, 140);
+		glPopMatrix();
+
+		//front topwall
+		glPushMatrix();
+		glTranslatef(0, 17, 20);
+		glScalef(4, 3, .2);
+		DrawCube(149, 146, 140);
+		glPopMatrix();
+
+
+		///front Door
+		//door frame
+		glPushMatrix();
+		glTranslatef(4.1, 7, 20);
+		glScalef(.5, 7, .3);
+		DrawCube(173, 123, 7);
+		glPopMatrix();
+		glPushMatrix();
+		glTranslatef(-4.1, 7, 20);
+		glScalef(.5, 7, .3);
+		DrawCube(173, 123, 7);
+		glPopMatrix();
+		//doorframe top bar
+		glPushMatrix();
+		glTranslatef(0, 14, 20);
+		glScalef(4.8, .5, .3);
+		DrawCube(173, 123, 7);
+		glPopMatrix();
+
+
+		//door
+		glPushMatrix();
+		glTranslatef(-4, 7, 20);
+		//glRotatef(door_theta, 0, 1, 0);
+		glTranslatef(4, -7, -20);
+		Door();
+		glPopMatrix();
+
+		//ceil
+		glPushMatrix();
+		glTranslatef(0, 20, 0);
+		glScalef(20, 0.4, 20);
+		DrawCube(168, 168, 168);
+		glPopMatrix();
+
+		//ceil frame
+	//    glPushMatrix();
+	//    glTranslatef(0, 20, 20.2);
+	//    glScalef(22, .5, .2);
+	//    drawcube(25,25,25);
+	//    glPopMatrix();
+
+
+		//room frame
+		glPushMatrix();
+		glTranslatef(18, 10, 20);
+		glScalef(.2, 10, .3);
+		DrawCube(30, 30, 30);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(-18, 10, 20);
+		glScalef(.2, 10, .3);
+		DrawCube(30, 30, 30);
+		glPopMatrix();
+
+		//floor
+		glPushMatrix();
+		glScalef(20, 0.1, 20);
+		DrawCube(168, 168, 168);
+		glPopMatrix();
+
+		//tiles
+		glPushMatrix();
+		for (GLint hCount = 1; hCount < 40; hCount += 4)
+		{
+			for (GLint vCount = 1; vCount < 40; vCount += 4)
+			{
+				if ((hCount + vCount) % 2 == 0)
+				{
+					glPushMatrix();
+					glTranslatef(-19 + hCount, 0.1, -19 + vCount);
+					glScalef(1.5, 0.1, 1.5);
+
+					DrawCube(25, 25, 25);
+					glPopMatrix();
+				}
+			}
+		}
+		glPopMatrix();
+
+		//left wall
+		glPushMatrix();
+		glTranslatef(-20, 10, 0);
+		glScalef(.1, 10, 20);
+		DrawCube(104, 139, 153);
+		glPopMatrix();
+
+		//right wall
+		glPushMatrix();
+		glTranslatef(20, 10, 0);
+		glScalef(.1, 10, 20);
+		DrawCube(104, 139, 153);
+		glPopMatrix();
+
+		//back wall left
+		glPushMatrix();
+		glTranslatef(-12, 10, -20);
+		glRotatef(180, 0, 1, 0);
+		glScalef(8, 10, .1);
+		DrawCube(104 - 25, 139 - 25, 153 - 25);
+		glPopMatrix();
+
+		//backwall right
+		glPushMatrix();
+		glTranslatef(12, 10, -20);
+		glRotatef(180, 0, 1, 0);
+		glScalef(8, 10, .1);
+		DrawCube(104 - 25, 139 - 25, 153 - 25);
+		glPopMatrix();
+
+
+		//backwall bottom
+		glPushMatrix();
+		glTranslatef(0, 2.5, -20);
+		glRotatef(180, 0, 1, 0);
+		glScalef(4, 2.5, .1);
+		DrawCube(104 - 25, 139 - 25, 153 - 25);
+		glPopMatrix();
+
+		//backwall top
+		glPushMatrix();
+		glTranslatef(0, 17.5, -20);
+		glRotatef(180, 0, 1, 0);
+		glScalef(4, 2.5, .1);
+		DrawCube(104 - 25, 139 - 25, 153 - 25);
+		glPopMatrix();
+
+		glPushMatrix();
+		WindowFrame();
+		glPopMatrix();
+
+		//bathroom
+		glPushMatrix();
+		glTranslatef(-10, 10, -10);
+		glScalef(0.2, 10, 10);
+		DrawCube(200, 200, 125);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(-15, 10, 0);
+		glScalef(5, 10, .2);
+		DrawCube(200, 200, 125);
+		glPopMatrix();
+
+		//bathroom door
+		glPushMatrix();
+		glTranslatef(-15, 6, 0.1);
+		glScalef(3, 6, .2);
+		DrawCube(200, 75, 75);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(-13, 6, 0.1);
+		glScalef(.2, .5, .3);
+		DrawCube(100, 37, 37);
+		glPopMatrix();
+
+		//bed
+		glPushMatrix();
+		glTranslatef(14, -1.1, -3);
+		Bed();
+		glPopMatrix();
+
+		//almirah
+		glPushMatrix();
+		Almirah();
+		glPopMatrix();
+	}
+	
+	static void FirstFloor()
+	{
+		glPushMatrix();
+		DrawRoom();
+		glPopMatrix();
+		glPushMatrix();
+		glTranslatef(40, 0, 0);
+		DrawRoom();
+		glPopMatrix();
+		glPushMatrix();
+		glTranslatef(-40, 0, 0);
+		DrawRoom();
+		glPopMatrix();
+
+		//base
+		glPushMatrix();
+		FloorBase();
+		glPopMatrix();
+
+		//ground
+	}
+
+	static void SecondFloor()
+	{
+		//rooms
+		glPushMatrix();
+		glTranslatef(0, 20, 0);
+		DrawRoom();
+		glPopMatrix();
+		glPushMatrix();
+		glTranslatef(40, 20, 0);
+		DrawRoom();
+		glPopMatrix();
+		glPushMatrix();
+		glTranslatef(-40, 20, 0);
+		DrawRoom();
+		glPopMatrix();
+
+		//corridor
+		glPushMatrix();
+		Corridor();
+		glPopMatrix();
+
+		//roof
+		glPushMatrix();
+		Roof();
+		glPopMatrix();
+	}
+
+	static void Pillars()
+	{
+		glPushMatrix();
+		glTranslatef(20, 20.2, 28.5);
+		glScalef(3, 40, 3);
+		Cylinder(188, 188, 188);
+		glPopMatrix();
+
+
+		glPushMatrix();
+		glTranslatef(-20, 20.2, 28.5);
+		glScalef(3, 40, 3);
+		Cylinder(188, 188, 188);
+		glPopMatrix();
+
+
+		glPushMatrix();
+		glTranslatef(-60, 20.2, 28.5);
+		glScalef(3, 40, 3);
+		Cylinder(188, 188, 188);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(60, 20.2, 28.5);
+		glScalef(3, 40, 3);
+		Cylinder(188, 188, 188);
+		glPopMatrix();
+	}
+	
+	static void Stair()
+	{
+		//halfway base
+		glPushMatrix();
+		glTranslatef(-65, 10, -16);
+		glScalef(7, .5, 4);
+		DrawCube(244, 201, 105);
+		glPopMatrix();
+
+		//stairs top
+		glPushMatrix();
+		glTranslatef(-61.5, 10.5, -11);
+		glScalef(3.5, .75, 2.5);
+		DrawCube(255, 255, 255);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(-61.5, 11.5, -7);
+		glScalef(3.5, .75, 2.5);
+		DrawCube(255, 255, 255);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(-61.5, 12.5, -3);
+		glScalef(3.5, .75, 2.5);
+		DrawCube(255, 255, 255);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(-61.5, 13.5, 1);
+		glScalef(3.5, .75, 2.5);
+		DrawCube(255, 255, 255);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(-61.5, 14.5, 5);
+		glScalef(3.5, .75, 2.5);
+		DrawCube(255, 255, 255);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(-61.5, 15.5, 9);
+		glScalef(3.5, .75, 2.5);
+		DrawCube(255, 255, 255);
+		glPopMatrix();
+		glPushMatrix();
+		glTranslatef(-61.5, 16.5, 13);
+		glScalef(3.5, .75, 2.5);
+		DrawCube(255, 255, 255);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(-61.5, 17.5, 17);
+		glScalef(3.5, .75, 2.5);
+		DrawCube(255, 255, 255);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(-61.5, 19, 19);
+		glScalef(3.5, .75, 2.5);
+		DrawCube(255, 255, 255);
+		glPopMatrix();
+
+		//stairs bottom
+		glPushMatrix();
+		glTranslatef(-68.5, 9.5, -11);
+		glScalef(3.5, .75, 2.5);
+		DrawCube(255, 255, 255);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(-68.5, 8.5, -7);
+		glScalef(3.5, .75, 2.5);
+		DrawCube(255, 255, 255);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(-68.5, 7.5, -3);
+		glScalef(3.5, .75, 2.5);
+		DrawCube(255, 255, 255);
+		glPopMatrix();
+		glPushMatrix();
+		glTranslatef(-68.5, 6.5, 1);
+		glScalef(3.5, .75, 2.5);
+		DrawCube(255, 255, 255);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(-68.5, 5.5, 5);
+		glScalef(3.5, .75, 2.5);
+		DrawCube(255, 255, 255);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(-68.5, 4.5, 9);
+		glScalef(3.5, .75, 2.5);
+		DrawCube(255, 255, 255);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(-68.5, 3.5, 13);
+		glScalef(3.5, .75, 2.5);
+		DrawCube(255, 255, 255);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(-68.5, 2.5, 17);
+		glScalef(3.5, .75, 2.5);
+		DrawCube(255, 255, 255);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(-68.5, 1.5, 21);
+		glScalef(3.5, .75, 2.5);
+		DrawCube(255, 255, 255);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(-68.5, 0.5, 25);
+		glScalef(3.5, .75, 2.5);
+		DrawCube(255, 255, 255);
+		glPopMatrix();
+	}
+	
+	static void FirstFloorFence()
+	{
+		//horizontal lines
+		glPushMatrix();
+		glTranslatef(-5.5, 27, 29);
+		glScalef(64, .4, .4);
+		DrawCube(50, 50, 50);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(58, 27, 24.5);
+		glScalef(.4, .4, 4.5);
+		DrawCube(50, 50, 50);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(-68, 27, 24.5);
+		glScalef(.4, .4, 4.5);
+		DrawCube(50, 50, 50);
+		glPopMatrix();
+
+		//vertical lines
+		for (GLint i = 0; i < 64; i++)
+		{
+			glPushMatrix();
+			glTranslatef(58 - i * 2, 23.5, 29);
+			glScalef(.4, 3.2, .4);
+			DrawCube(255, 255, 255);
+			glPopMatrix();
+		}
+		//fence towards z axis right
+		for (GLint i = 1; i < 5; i++)
+		{
+			glPushMatrix();
+			glTranslatef(58, 23.5, 29 - i * 2);
+			glScalef(.4, 3.2, .4);
+			DrawCube(255, 255, 255);
+			glPopMatrix();
+		}
+		//fence towards z axis left
+		for (GLint i = 1; i < 5; i++)
+		{
+			glPushMatrix();
+			glTranslatef(-68, 23.5, 29 - i * 2);
+			glScalef(.4, 3.2, .4);
+			DrawCube(255, 255, 255);
+			glPopMatrix();
+		}
+	}
+	
+	static void GroundFence()
+	{
+		//horizontal lines
+		//right
+		glPushMatrix();
+		glTranslatef(40.5, 7, 29);
+		glScalef(20, .4, .4);
+		DrawCube(50, 50, 50);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(58, 7, 24.5);
+		glScalef(.4, .4, 4.5);
+		DrawCube(50, 50, 50);
+		glPopMatrix();
+
+		//left
+		glPushMatrix();
+		glTranslatef(-45.5, 7, 29);
+		glScalef(25, .4, .4);
+		DrawCube(50, 50, 50);
+		glPopMatrix();
+
+		//vertical fences
+		//right
+		for (GLint i = 0; i < 20; i++)
+		{
+			glPushMatrix();
+			glTranslatef(58 - i * 2, 3.5, 29);
+			glScalef(.4, 3.2, .4);
+			DrawCube(255, 255, 255);
+			glPopMatrix();
+		}
+		//left
+		for (GLint i = 40; i < 65; i++)
+		{
+			glPushMatrix();
+			glTranslatef(58 - i * 2, 3.5, 29);
+			glScalef(.4, 3.2, .4);
+			DrawCube(255, 255, 255);
+			glPopMatrix();
+		}
+
+		//fence towards z axis right
+		for (GLint i = 1; i < 5; i++)
+		{
+			glPushMatrix();
+			glTranslatef(58, 3.5, 29 - i * 2);
+			glScalef(.4, 3.2, .4);
+			DrawCube(255, 255, 255);
+			glPopMatrix();
+		}
+	}
+	
+	static void StairFence()
+	{
+		for (GLint i = 0; i < 14; i++)
+		{
+			glPushMatrix();
+			glTranslatef(-70, 3.5 + i * .75, 25 - i * 3);
+			glScalef(.4, 3.2, .4);
+			DrawCube(0, 255, 255);
+			glPopMatrix();
+		}
+
+		glPushMatrix();
+		glTranslatef(-70, 3.5 + 13 * .75, 25 - 14 * 3 + 1);
+		glScalef(.4, 3.2, .4);
+		DrawCube(0, 255, 255);
+		glPopMatrix();
+		glPushMatrix();
+		glTranslatef(-70, 3.5 + 13 * .75, 25 - 14 * 3 + 1 - 2);
+		glScalef(.4, 3.2, .4);
+		DrawCube(0, 255, 255);
+		glPopMatrix();
+		glPushMatrix();
+		glTranslatef(-70, 3.5 + 13 * .75, 25 - 14 * 3 + 1 - 3.5);
+		glScalef(.4, 3.2, .4);
+		DrawCube(0, 255, 255);
+		glPopMatrix();
+
+		for (GLint i = 0; i < 5; i++)
+		{
+			glPushMatrix();
+			glTranslatef(-70 + i * 2, 3.5 + 13 * .75, 25 - 14 * 3 + 1 - 3.5);
+			glScalef(.4, 3.2, .4);
+			DrawCube(0, 255, 255);
+			glPopMatrix();
+		}
+
+		//inclined line
+		glPushMatrix();
+		glTranslatef(-70, 11.5, 7);
+		glRotatef(13.5, 1, 0, 0);
+		glScalef(.6, .6, 20);
+		DrawCube(50, 50, 50);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(-70, 7, 27.4);
+		glScalef(.6, .6, 2);
+		DrawCube(40, 40, 0);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(-70, 16, -15.8);
+		glScalef(.6, .6, 4.5);
+		DrawCube(40, 40, 40);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(-65.0002, 16, -19.4);
+		glScalef(5, .6, .6);
+		DrawCube(50, 50, 50);
+		glPopMatrix();
+	}
+	
+	static void Building()
+	{
+		glPushMatrix();
+		FirstFloor();
+		SecondFloor();
+		Pillars();
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(-13.5, 0, 0);
+		glScalef(.8, 1, 1);
+		Stair();
+		glPopMatrix();
+
+		glPushMatrix();
+		FirstFloorFence();
+		glPopMatrix();
+
+		glPushMatrix();
+		GroundFence();
+		glPopMatrix();
+
+		glPushMatrix();
+		StairFence();
+		glPopMatrix();
+
+		/*glPushMatrix();
+		sky();
+		glPopMatrix();
+		
+		glPushMatrix();
+		ground();
+		glPopMatrix();*/
+	}
+	
+	static void Buildings()
+	{
+		glPushMatrix();
+		glTranslatef(-75, 0, 0);
+		glRotatef(40, 0, 1, 0);
+		Building();
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(75, 0, 0);
+		glRotatef(-40, 0, 1, 0);
+		glScalef(-1, 1, 1);
+		Building();
+		glPopMatrix();
+	}
+	
+	static void Hall()
+	{
+		//glPushMatrix(); //hall tree
+		//glTranslatef(40, -80, 300);
+		//glScalef(1.5, 1.5, 1.5);
+		//tree();
+		//glPopMatrix();
+		//
+		//glPushMatrix(); //hall tree
+		//glTranslatef(40, -80, 360);
+		//glScalef(1.5, 1.5, 1.5);
+		//tree();
+		//glPopMatrix();
+
+		//glPushMatrix(); //hall tree
+		//glTranslatef(90, -80, 300);
+		//glScalef(1.5, 1.5, 1.5);
+		//tree();
+		//glPopMatrix();
+
+		//glPushMatrix(); //hall tree2
+		//glTranslatef(420, -80, 350);
+		//glScalef(1.5, 1.5, 1.5);
+		//tree();
+		//glPopMatrix();
+
+		//glPushMatrix(); //hall tree2
+		//glTranslatef(460, -80, 300);
+		//glScalef(1.5, 1.5, 1.5);
+		//tree();
+		//glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(135.5 + 116.5, 31.5, 173 + 224);
+		glRotatef(225, 0, 1, 0);
+		glScalef(2, 2, 2);
+		Buildings();
+		glPopMatrix();
+
+		glPushMatrix();
+		//glBindTexture(GL_TEXTURE_2D, ID[grass]);
+		glTranslatef(262.5, 0, 180);
+		glScalef(325, 6, 475); //floor of the hall
+		Cube(0, 255, 0);
+		glPopMatrix();
+	}
+
 	static void Scene()
 	{
 		glPushMatrix();
@@ -418,6 +1509,11 @@ namespace Scene {
 
 		glPushMatrix();
 		ShahidMinar();
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(405, 12, -3.5);
+		Hall();
 		glPopMatrix();
 	}
 
