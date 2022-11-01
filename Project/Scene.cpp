@@ -6,6 +6,7 @@ import Settings;
 
 #include <array>
 #include <iostream>
+#include <numbers>
 #include <string>
 
 // Textures
@@ -15,7 +16,7 @@ extern std::array<unsigned int, texture_count> textures;
 
 namespace Scene {
 	// Global Variables
-	
+
 	// Key States
 	static std::array<bool, 256> keyStates = { false };
 
@@ -36,6 +37,9 @@ namespace Scene {
 	static GLfloat angleX = 0.0f, angleY = 0.0f, angleZ = 0.0f;
 	static GLfloat axisX = 0.0f, axisY = 0.0f, axisZ = 0.0f;
 	static bool rotateX = false, rotateY = false, rotateZ = false;
+
+	// Roll, Pitch, Yaw
+	static GLdouble anglePitch = 90.0, angleYaw = 90.0, angleRoll = 0.0;
 
 	// Lights Controls
 	static bool light0 = true, light1 = false, light2 = false, light3 = true;
@@ -60,7 +64,7 @@ namespace Scene {
 		{ 0.55, 0.55, 0.0},
 		{ 0.55, 0.0, 0.0}
 	};
-	
+
 	GLdouble modelview[16]; //var to hold the modelview info
 
 	static void GetNormal3f(
@@ -84,10 +88,10 @@ namespace Scene {
 
 		glNormal3f(Nx, Ny, Nz);
 	}
-	
-	static void setNormal(
-		GLfloat x1, GLfloat y1, GLfloat z1, 
-		GLfloat x2, GLfloat y2, GLfloat z2, 
+
+	static void SetNormal3f(
+		GLfloat x1, GLfloat y1, GLfloat z1,
+		GLfloat x2, GLfloat y2, GLfloat z2,
 		GLfloat x3, GLfloat y3, GLfloat z3)
 	{
 		GLfloat Ux, Uy, Uz, Vx, Vy, Vz, Nx, Ny, Nz;
@@ -207,7 +211,7 @@ namespace Scene {
 		xy[0] = float(x);
 		xy[1] = float(y);
 	}
-	
+
 	static void MinarCircleBezier()
 	{
 		int i, j;
@@ -253,7 +257,7 @@ namespace Scene {
 
 				if (j > 0)
 				{
-					setNormal(p1x, p1y, p1z, p2x, p2y, p2z, x, y, z);
+					SetNormal3f(p1x, p1y, p1z, p2x, p2y, p2z, x, y, z);
 				}
 				else
 				{
@@ -263,10 +267,9 @@ namespace Scene {
 					p2x = x1;
 					p2y = y1;
 					p2z = z1;
-
 				}
-				glVertex3f(x1, y1, z1);
 
+				glVertex3f(x1, y1, z1);
 				//forms quad with next pair of points with incremented theta value
 			}
 			glEnd();
@@ -274,7 +277,7 @@ namespace Scene {
 			r = r1;
 		} //for i
 	}
-	
+
 	static void Curve()
 	{
 		const double t = glutGet(GLUT_ELAPSED_TIME) / 5000.0;
@@ -327,6 +330,26 @@ namespace Scene {
 		glPopMatrix();
 	}
 
+	static void Circle3D(GLdouble radius)
+	{
+		GLUquadric* qobj = gluNewQuadric();
+		gluQuadricTexture(qobj, GL_TRUE);
+
+		glRotatef(270, 1, 0, 0);
+		gluSphere(qobj, radius, 20, 20);
+		gluDeleteQuadric(qobj);
+	}
+
+	static void Cylinder3D(GLdouble height, GLdouble rad, GLdouble rad2)
+	{
+		GLUquadric* qobj = gluNewQuadric();
+		gluQuadricTexture(qobj, GL_TRUE);
+		glRotatef(90, 1, 0, 0);
+
+		gluCylinder(qobj, rad, rad2, height, 20, 20);
+		gluDeleteQuadric(qobj);
+	}
+
 	// Texture Enum to Texture ID
 	enum Textures
 	{
@@ -339,7 +362,9 @@ namespace Scene {
 		white_wall,
 		wood,
 		floor,
-		roof_tile
+		roof_tile,
+		tree,
+		leaf
 	};
 
 	// Drawing Earth
@@ -361,6 +386,94 @@ namespace Scene {
 		glPushMatrix();
 		glScalef(250, 5, 250);
 		Cube();
+		glPopMatrix();
+		glDisable(GL_TEXTURE_2D);
+	}
+
+	static void SubTree()
+	{
+		glBindTexture(GL_TEXTURE_2D, textures[wood]);
+		glPushMatrix();
+		glTranslatef(0, 40, 0);
+		Cylinder3D(25, 1, 1);									//base
+		glPopMatrix();
+
+		glBindTexture(GL_TEXTURE_2D, textures[leaf]);
+		glPushMatrix();
+		glTranslatef(0, 40, 0);
+		Circle3D(10);											//leaf
+		glPopMatrix();
+	}
+
+	static void SubTreeUpper()
+	{
+		glPushMatrix();
+		glTranslatef(0, 90, 0);
+		glRotatef(90, 0, 1, 0);
+		glScalef(2, 1, 2);
+		SubTree();												//1
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(0, 88, 0);
+		glRotatef(10, 1, 0, 0);
+		glScalef(2, 1, 2);
+		SubTree();												//1
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(0, 88, 0);
+		glRotatef(-10, 1, 0, 0);
+		glScalef(2, 1, 2);
+		SubTree();												//1
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(0, 90, 0);
+		glRotatef(10, 0, 0, 1);
+		glScalef(2, 1, 2);
+		SubTree();												//1
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(0, 90, 0);
+		glRotatef(-10, 0, 0, 1);
+		glScalef(2, 1, 2);
+		SubTree();												//1
+		glPopMatrix();
+	}
+
+	static void Tree()
+	{
+		glPushMatrix();
+		glTranslatef(0, 95, -8);
+		glRotatef(55, 1, 0, 0);
+		glScalef(0.7, 0.7, 0.7);
+		SubTree();												//1
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(0, 95, 8);
+		glRotatef(-55, 1, 0, 0);
+		glScalef(0.7, 0.7, 0.7);
+		SubTree();												//1
+		glPopMatrix();
+
+		glPushMatrix();
+		SubTreeUpper();
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(0, 10, 0);
+		glScalef(0.8, 1, 0.8);
+		SubTreeUpper();
+		glPopMatrix();
+
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, textures[tree]);
+		glPushMatrix();
+		glTranslatef(0, 120, 0);
+		Cylinder3D(80, 4, 8);									//tree base
 		glPopMatrix();
 		glDisable(GL_TEXTURE_2D);
 	}
@@ -440,25 +553,23 @@ namespace Scene {
 		glPopMatrix();
 		glDisable(GL_TEXTURE_2D);
 
-		//glBindTexture(GL_TEXTURE_2D, ID[white]);
-
 		glPushMatrix();
 		glTranslatef(100, 8, -50);
 		glScalef(75, 1, 3);
 		Cube();
 		glPopMatrix();
 
-		//glPushMatrix();
-		//glTranslatef(180, -60, -150);
-		//glScalef(1.5, 1.5, 1.5);
-		//Tree();   //sohid minar tree
-		//glPopMatrix();
+		glPushMatrix();
+		glTranslatef(180, -60, -150);
+		glScalef(1.5, 1.5, 1.5);
+		Tree();   //sohid minar tree
+		glPopMatrix();
 
-		//glPushMatrix();
-		//glTranslatef(180, -60, 130);
-		//glScalef(1.5, 1.5, 1.5);
-		//Tree();   //sohid minar tree2
-		//glPopMatrix();
+		glPushMatrix();
+		glTranslatef(180, -60, 130);
+		glScalef(1.5, 1.5, 1.5);
+		Tree();   //sohid minar tree2
+		glPopMatrix();
 	}
 
 	static void MinarBase()
@@ -644,7 +755,7 @@ namespace Scene {
 		glPopMatrix();*/
 	}
 
-	
+
 	// Hall
 	static GLfloat cube[8][3] =
 	{
@@ -669,7 +780,7 @@ namespace Scene {
 		{2,1,5,6},
 		{7,4,0,3},
 	};
-	
+
 	static void DrawCube(GLint R = 255, GLint G = 255, GLint B = 255, GLboolean emission = false)
 	{
 		GLfloat r = R / 255.0f;
@@ -708,7 +819,7 @@ namespace Scene {
 				glEnd();
 			}
 	}
-	
+
 	static void Cylinder(GLint c1, GLint c2, GLint c3, GLboolean emission = false)
 	{
 
@@ -785,7 +896,7 @@ namespace Scene {
 
 		glPopMatrix();
 	}
-	
+
 	static void Bed()
 	{
 		//bed
@@ -863,7 +974,7 @@ namespace Scene {
 		DrawCube(255, 0, 255);
 		glPopMatrix();
 	}
-	
+
 	static void Almirah()
 	{
 		glPushMatrix();
@@ -946,7 +1057,7 @@ namespace Scene {
 		DrawCube(200, 200, 200);
 		glPopMatrix();
 	}
-	
+
 	static void WindowFrame()
 	{
 		//windowframe
@@ -992,7 +1103,7 @@ namespace Scene {
 		DrawCube();
 		glPopMatrix();
 	}
-	
+
 	static void Door()
 	{
 		//door
@@ -1002,7 +1113,7 @@ namespace Scene {
 		DrawCube(183, 159, 127);
 		glPopMatrix();
 	}
-	
+
 	static void Corridor()
 	{
 		glPushMatrix();
@@ -1011,7 +1122,7 @@ namespace Scene {
 		DrawCube(220, 220, 0);
 		glPopMatrix();
 	}
-	
+
 	static void Roof()
 	{
 		glPushMatrix();
@@ -1029,7 +1140,7 @@ namespace Scene {
 		glPopMatrix();
 		glDisable(GL_TEXTURE_2D);
 	}
-	
+
 	static void FloorBase()
 	{
 		glEnable(GL_TEXTURE_2D);
@@ -1082,17 +1193,17 @@ namespace Scene {
 	static void DrawRoom()
 	{
 		///frontwalls
-		
+
 		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, textures[red_brick]);
-		
+
 		//front leftwall
 		glPushMatrix();
 		glTranslatef(-12, 10, 20);
 		glScalef(8, 10, .2);
 		DrawCube();
 		glPopMatrix();
-		
+
 		//front rightwall
 		glPushMatrix();
 		glTranslatef(12, 10, 20);
@@ -1106,12 +1217,12 @@ namespace Scene {
 		glScalef(4, 3, .2);
 		DrawCube();
 		glPopMatrix();
-		
+
 		glDisable(GL_TEXTURE_2D);
 
 
 		///front Door
-		
+
 		//door frame
 		glPushMatrix();
 		glTranslatef(4.1, 7, 20);
@@ -1194,7 +1305,7 @@ namespace Scene {
 
 		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, textures[red_brick]);
-		
+
 		//left wall
 		glPushMatrix();
 		glTranslatef(-20, 10, 0);
@@ -1241,7 +1352,7 @@ namespace Scene {
 		glScalef(4, 2.5, .1);
 		DrawCube();
 		glPopMatrix();
-		
+
 		glDisable(GL_TEXTURE_2D);
 
 		glEnable(GL_TEXTURE_2D);
@@ -1288,18 +1399,18 @@ namespace Scene {
 		Almirah();
 		glPopMatrix();
 	}
-	
+
 	static void FirstFloor()
 	{
 		glPushMatrix();
 		DrawRoom();
 		glPopMatrix();
-		
+
 		glPushMatrix();
 		glTranslatef(40, 0, 0);
 		DrawRoom();
 		glPopMatrix();
-		
+
 		glPushMatrix();
 		glTranslatef(-40, 0, 0);
 		DrawRoom();
@@ -1320,12 +1431,12 @@ namespace Scene {
 		glTranslatef(0, 20, 0);
 		DrawRoom();
 		glPopMatrix();
-		
+
 		glPushMatrix();
 		glTranslatef(40, 20, 0);
 		DrawRoom();
 		glPopMatrix();
-		
+
 		glPushMatrix();
 		glTranslatef(-40, 20, 0);
 		DrawRoom();
@@ -1341,7 +1452,7 @@ namespace Scene {
 		Roof();
 		glPopMatrix();*/
 	}
-	
+
 	static void ThirdFloor()
 	{
 		//rooms
@@ -1365,7 +1476,7 @@ namespace Scene {
 		Corridor();
 		glPopMatrix();
 	}
-	
+
 	static void FourthFloor()
 	{
 		//rooms
@@ -1389,7 +1500,7 @@ namespace Scene {
 		Corridor();
 		glPopMatrix();
 	}
-	
+
 	static void FifthFloor()
 	{
 		//rooms
@@ -1447,7 +1558,7 @@ namespace Scene {
 		Cylinder(188, 188, 188);
 		glPopMatrix();
 	}
-	
+
 	static void FirstFloorFence()
 	{
 		//horizontal lines
@@ -1497,7 +1608,7 @@ namespace Scene {
 			glPopMatrix();
 		}
 	}
-	
+
 	static void GroundFence()
 	{
 		//horizontal lines
@@ -1551,7 +1662,7 @@ namespace Scene {
 			glPopMatrix();
 		}
 	}
-	
+
 	static void Building()
 	{
 		glPushMatrix();
@@ -1559,25 +1670,25 @@ namespace Scene {
 		SecondFloor();
 		Pillars();
 		glPopMatrix();
-		
+
 		glPushMatrix();
 		glTranslatef(0, 20, 0);
 		ThirdFloor();
 		Pillars();
 		glPopMatrix();
-		
+
 		glPushMatrix();
 		glTranslatef(0, 40, 0);
 		FourthFloor();
 		Pillars();
 		glPopMatrix();
-		
+
 		glPushMatrix();
 		glTranslatef(0, 60, 0);
 		FifthFloor();
 		Pillars();
 		glPopMatrix();
-		
+
 		/*glPushMatrix();
 		glTranslatef(-13.5, 0, 0);
 		glScalef(.8, 1, 1);
@@ -1599,12 +1710,12 @@ namespace Scene {
 		/*glPushMatrix();
 		sky();
 		glPopMatrix();
-		
+
 		glPushMatrix();
 		ground();
 		glPopMatrix();*/
 	}
-	
+
 	static void Buildings()
 	{
 		glPushMatrix();
@@ -1620,38 +1731,38 @@ namespace Scene {
 		Building();
 		glPopMatrix();
 	}
-	
+
 	static void Hall()
 	{
-		//glPushMatrix(); //hall tree
-		//glTranslatef(40, -80, 300);
-		//glScalef(1.5, 1.5, 1.5);
-		//tree();
-		//glPopMatrix();
-		//
-		//glPushMatrix(); //hall tree
-		//glTranslatef(40, -80, 360);
-		//glScalef(1.5, 1.5, 1.5);
-		//tree();
-		//glPopMatrix();
+		glPushMatrix(); //hall tree
+		glTranslatef(40, -54, 300);
+		glScalef(1.5, 1.5, 1.5);
+		Tree();
+		glPopMatrix();
 
-		//glPushMatrix(); //hall tree
-		//glTranslatef(90, -80, 300);
-		//glScalef(1.5, 1.5, 1.5);
-		//tree();
-		//glPopMatrix();
+		glPushMatrix(); //hall tree
+		glTranslatef(40, -54, 360);
+		glScalef(1.5, 1.5, 1.5);
+		Tree();
+		glPopMatrix();
 
-		//glPushMatrix(); //hall tree2
-		//glTranslatef(420, -80, 350);
-		//glScalef(1.5, 1.5, 1.5);
-		//tree();
-		//glPopMatrix();
+		glPushMatrix(); //hall tree
+		glTranslatef(90, -54, 300);
+		glScalef(1.5, 1.5, 1.5);
+		Tree();
+		glPopMatrix();
 
-		//glPushMatrix(); //hall tree2
-		//glTranslatef(460, -80, 300);
-		//glScalef(1.5, 1.5, 1.5);
-		//tree();
-		//glPopMatrix();
+		glPushMatrix(); //hall tree2
+		glScalef(1.5, 1.5, 1.5);
+		glTranslatef(320, -50, 350);
+		Tree();
+		glPopMatrix();
+
+		glPushMatrix(); //hall tree2
+		glScalef(1.5, 1, 1.5);
+		glTranslatef(360, -50, 300);
+		Tree();
+		glPopMatrix();
 
 		glPushMatrix();
 		glTranslatef(135.5 + 116.5, 31.5, 173 + 224);
@@ -1903,6 +2014,104 @@ namespace Scene {
 			std::cout << "Translation: " << Scene::x << ", " << Scene::y << ", " << Scene::z << std::endl;
 #endif // _DEBUG
 		}
+
+		// Roll, Pitch, Yaw
+		GLfloat x1 = lookX - cameraX;
+		GLfloat z1 = lookZ - cameraZ;
+		GLfloat r = sqrt(x1 * x1 + z1 * z1);
+
+		GLfloat theta = 0.0f;
+		if (x1 == 0)
+		{
+			if (z1 > 0)
+				theta = 90;
+			else if (z1 < 0)
+				theta = -90;
+		}
+		else
+			theta = atan(z1 / x1) * 180 / std::numbers::pi;
+
+		if ((z1 > 0 && theta < 0) || (z1 < 0 && theta>0))
+			theta += 180;
+		else if (z1 < 0 && theta < 0)
+			theta += 360;
+
+		GLfloat turn_angle_step = 10;
+
+		if (Scene::keyStates['u'])
+		{
+			theta -= turn_angle_step;
+			theta = theta * std::numbers::pi / 180;
+			lookX = r * cos(theta) + cameraX;
+			lookZ = r * sin(theta) + cameraZ;
+		}
+		if (Scene::keyStates['U'])
+		{
+			theta += turn_angle_step;
+			theta = theta * std::numbers::pi / 180;
+			lookX = r * cos(theta) + cameraX;
+			lookZ = r * sin(theta) + cameraZ;
+		}
+
+		if (Scene::keyStates['r'])
+			lookY += 1.0f;
+		
+		if (Scene::keyStates['R'])
+			lookY -= 1.0f;
+		
+		if (Scene::keyStates['p'])
+		{
+			anglePitch -= 1.0f;
+			lookX = r * (cos(anglePitch * std::numbers::pi / 180.0)) * (cos(angleYaw * std::numbers::pi / 180.0));
+			lookY = r * (sin(anglePitch * std::numbers::pi / 180.0));
+			lookZ = r * (cos(anglePitch * std::numbers::pi / 180.0)) * (sin(angleYaw * std::numbers::pi / 180.0));
+		}
+		if (Scene::keyStates['P'])
+		{
+			anglePitch += 1.0f;
+			lookX = 50.0 * (cos(anglePitch * std::numbers::pi / 180.0)) * (cos(angleYaw * std::numbers::pi / 180.0));
+			lookY = 50.0 * (sin(anglePitch * std::numbers::pi / 180.0));
+			lookZ = 50.0 * (cos(anglePitch * std::numbers::pi / 180.0)) * (sin(angleYaw * std::numbers::pi / 180.0));
+		}
+
+		GLfloat r1 = 1.0f;
+		GLdouble dx = r1 * cos(theta * std::numbers::pi / 180);
+		GLdouble dz = r1 * sin(theta * std::numbers::pi / 180);
+
+		GLdouble dx_norm = r1 * cos((theta - 90) * std::numbers::pi / 180);
+		GLdouble dz_norm = r1 * sin((theta - 90) * std::numbers::pi / 180);
+
+		/*if (Scene::keyStates['j'])
+		{
+			cameraX += dx_norm * 3;
+			cameraZ += dz_norm * 3;
+
+			lookX += dx_norm * 3;
+			lookZ += dz_norm * 3;
+		}
+		if (Scene::keyStates['i'])
+		{
+			cameraX += dx * 3;
+			cameraZ += dz * 3;
+			lookX += dx * 3;
+			lookZ += dz * 3;
+		}
+		if (Scene::keyStates['k'])
+		{
+			cameraX -= dx * 3;
+			cameraZ -= dz * 3;
+
+			lookX -= dx * 3;
+			lookZ -= dz * 3;
+		}
+		if (Scene::keyStates['l'])
+		{
+			cameraX -= dx_norm * 3;
+			cameraZ -= dz_norm * 3;
+
+			lookX -= dx_norm * 3;
+			lookZ -= dz_norm * 3;
+		}*/
 	}
 
 	static void Special()
@@ -2071,6 +2280,42 @@ void Control::keyboard(unsigned char key, int x, int y)
 		Scene::keyStates['E'] = true;
 		break;
 
+		// Roll, Pitch, Yaw
+	case 'r':
+		Scene::keyStates['r'] = true;
+		break;
+	case 'p':
+		Scene::keyStates['p'] = true;
+		break;
+	case 'u':
+		Scene::keyStates['u'] = true;
+		break;
+
+		// Roll, Pitch, Yaw (Negative Direction)
+	case 'R':
+		Scene::keyStates['R'] = true;
+		break;
+	case 'P':
+		Scene::keyStates['P'] = true;
+		break;
+	case 'U':
+		Scene::keyStates['U'] = true;
+		break;
+
+		// Front-Back, Left-Right Movement
+	/*case 'j':
+		Scene::keyStates['j'] = true;
+		break;
+	case 'i':
+		Scene::keyStates['i'] = true;
+		break;
+	case 'k':
+		Scene::keyStates['k'] = true;
+		break;
+	case 'l':
+		Scene::keyStates['l'] = true;
+		break;*/
+
 		// Exit the program
 
 	case 27:
@@ -2102,6 +2347,40 @@ void Control::keyboardup(unsigned char key, int x, int y)
 	case 'E':
 		Scene::keyStates['E'] = false;
 		break;
+
+	case 'r':
+		Scene::keyStates['r'] = false;
+		break;
+	case 'p':
+		Scene::keyStates['p'] = false;
+		break;
+	case 'u':
+		Scene::keyStates['u'] = false;
+		break;
+
+	case 'R':
+		Scene::keyStates['R'] = false;
+		break;
+	case 'P':
+		Scene::keyStates['P'] = false;
+		break;
+	case 'U':
+		Scene::keyStates['U'] = false;
+		break;
+		
+	/*case 'j':
+		Scene::keyStates['j'] = false;
+		break;
+	case 'i':
+		Scene::keyStates['i'] = false;
+		break;
+	case 'k':
+		Scene::keyStates['k'] = false;
+		break;
+	case 'l':
+		Scene::keyStates['l'] = false;
+		break;*/
+
 	default:
 		break;
 	}

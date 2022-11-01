@@ -23,7 +23,9 @@ std::array<std::string, texture_count> texture_filenames = {
 	"Images\\white-wall.bmp",
 	"Images\\wood.bmp",
 	"Images\\floor.bmp",
-	"Images\\roof-tile.bmp"
+	"Images\\roof-tile.bmp",
+	"Images\\bark-tree.bmp",
+	"Images\\leaf.bmp"
 };
 
 // Function to load all textures
@@ -32,9 +34,7 @@ void LoadTextures()
 	glGenTextures(texture_count, textures.data());
 
 	for (int i = 0; i < texture_count; i++)
-	{
 		Texture::LoadTexture(texture_filenames[i], textures[i]);
-	}
 }
 
 

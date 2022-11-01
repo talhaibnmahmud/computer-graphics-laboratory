@@ -70,5 +70,11 @@
     <Image Include="Images\wood.bmp">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="Images\bark-tree.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Images\leaf.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

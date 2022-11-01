@@ -170,11 +170,13 @@
     <ClInclude Include="Scene.h" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="Images\bark-tree.bmp" />
     <Image Include="Images\black-road.bmp" />
     <Image Include="Images\cloud-sky.bmp" />
     <Image Include="Images\earth.bmp" />
     <Image Include="Images\floor.bmp" />
     <Image Include="Images\green-grass.bmp" />
+    <Image Include="Images\leaf.bmp" />
     <Image Include="Images\red-brick.bmp" />
     <Image Include="Images\roof-tile.bmp" />
     <Image Include="Images\water.bmp" />
