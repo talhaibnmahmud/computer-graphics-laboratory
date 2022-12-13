@@ -38,10 +38,37 @@ static GLfloat angleX = 0.0f, angleY = 0.0f, angleZ = 0.0f;
 static GLfloat axisX = 0.0f, axisY = 0.0f, axisZ = 0.0f;
 static bool rotateX = false, rotateY = false, rotateZ = false;
 
+// Placement
+double tx = 0, ty = 0, tz = 0;
+
 
 static void cylinder(GLfloat r=1, GLfloat g=1, GLfloat b=1) {
 	glPushMatrix();
 	glTranslatef(0, 1, 0);
+	glPushMatrix();
+	glColor3f(r, g, b);
+	glRotatef(90, 1, 0, 0);
+	gluCylinder(gluNewQuadric(), 1, 1, 2, 100, 100);
+	glPopMatrix();
+
+	glPushMatrix();
+	glColor3f(1, 1, 1);
+	glRotatef(-90, 1, 0, 0);
+	gluDisk(gluNewQuadric(), 0, 1, 100, 100);
+	glPopMatrix();
+
+	glPushMatrix();
+	glColor3f(1, 1, 1);
+	glTranslatef(0, -2, 0);
+	glRotatef(90, 1, 0, 0);
+	gluDisk(gluNewQuadric(), 0, 1, 100, 100);
+	glPopMatrix();
+	glPopMatrix();
+}
+
+static void cornercylinder(GLfloat r = 1, GLfloat g = 1, GLfloat b = 1) {
+	glPushMatrix();
+	//glTranslatef(0, 1, 0);
 	glPushMatrix();
 	glColor3f(r, g, b);
 	glRotatef(90, 1, 0, 0);
@@ -151,7 +178,6 @@ void B() {
 	glPopMatrix();
 }
 
-
 void I() {
 	glPushMatrix();
 	glScalef(1, 5, 1);
@@ -172,7 +198,6 @@ void I() {
 	cylinder();
 	glPopMatrix();
 }
-
 
 void L() {
 	glPushMatrix();
@@ -207,51 +232,39 @@ void N() {
 	glPopMatrix();
 }
 
-//static void placement()
-//{
-//	if (Scene::keyStates['A'])
-//	{
-//		Scene::x -= 0.5f;
-//#ifdef _DEBUG
-//		std::cout << "Translation: " << Scene::x << ", " << Scene::y << ", " << Scene::z << std::endl;
-//#endif // _DEBUG
-//	}
-//	if (Scene::keyStates['D'])
-//	{
-//		Scene::x += 0.5f;
-//#ifdef _DEBUG
-//		std::cout << "Translation: " << Scene::x << ", " << Scene::y << ", " << Scene::z << std::endl;
-//#endif // _DEBUG
-//	}
-//	if (Scene::keyStates['W'])
-//	{
-//		Scene::z -= 0.5f;
-//#ifdef _DEBUG
-//		std::cout << "Translation: " << Scene::x << ", " << Scene::y << ", " << Scene::z << std::endl;
-//#endif // _DEBUG
-//	}
-//	if (Scene::keyStates['S'])
-//	{
-//		Scene::z += 0.5f;
-//#ifdef _DEBUG
-//		std::cout << "Translation: " << Scene::x << ", " << Scene::y << ", " << Scene::z << std::endl;
-//#endif // _DEBUG
-//	}
-//	if (Scene::keyStates['Q'])
-//	{
-//		Scene::y -= 0.5f;
-//#ifdef _DEBUG
-//		std::cout << "Translation: " << Scene::x << ", " << Scene::y << ", " << Scene::z << std::endl;
-//#endif // _DEBUG
-//	}
-//	if (Scene::keyStates['E'])
-//	{
-//		Scene::y += 0.5f;
-//#ifdef _DEBUG
-//		std::cout << "Translation: " << Scene::x << ", " << Scene::y << ", " << Scene::z << std::endl;
-//#endif // _DEBUG
-//	}
-//}
+static void placement()
+{
+	if (keyStates['A'])
+	{
+		tx -= 0.5f;
+		std::cout << "Translation: " << tx << ", " << ty << ", " << tz << std::endl;
+	}
+	if (keyStates['D'])
+	{
+		tx += 0.5f;
+		std::cout << "Translation: " << tx << ", " << ty << ", " << tz << std::endl;
+	}
+	if (keyStates['W'])
+	{
+		tz -= 0.5f;
+		std::cout << "Translation: " << tx << ", " << ty << ", " << tz << std::endl;
+	}
+	if (keyStates['S'])
+	{
+		tz += 0.5f;
+		std::cout << "Translation: " << tx << ", " << ty << ", " << tz << std::endl;
+	}
+	if (keyStates['Q'])
+	{
+		ty -= 0.5f;
+		std::cout << "Translation: " << tx << ", " << ty << ", " << tz << std::endl;
+	}
+	if (keyStates['E'])
+	{
+		ty += 0.5f;
+		std::cout << "Translation: " << tx << ", " << ty << ", " << tz << std::endl;
+	}
+}
 
 static void panning()
 {
@@ -321,8 +334,9 @@ static void display()
 
 	glPushMatrix();
 	glTranslatef(0, 0, 0);
+	glRotatef(angleX, axisX, axisY, axisZ);
 	glScalef(5, 10, 1);
-	N();
+	cornercylinder();
 	glPopMatrix();
 
 	panning();
