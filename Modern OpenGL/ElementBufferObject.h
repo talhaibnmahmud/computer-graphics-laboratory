@@ -4,12 +4,16 @@
 #define EBO_H
 
 #include <glad/glad.h>
+
+#include <vector>
+
+
 class ElementBufferObject
 {
 public:
 	GLuint ID;
 public:
-	ElementBufferObject(GLuint* indices, GLsizeiptr size);
+	ElementBufferObject(std::vector<GLuint>& indices);
 	~ElementBufferObject();
 
 	void Bind();
