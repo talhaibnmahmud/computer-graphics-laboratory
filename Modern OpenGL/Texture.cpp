@@ -1,12 +1,13 @@
 #include "Texture.h"
 
 
-Texture::Texture(const char* image, GLenum textureType, GLenum textureSlot, GLenum format, GLenum pixelType)
+Texture::Texture(const char* image, GLenum textureType, GLuint textureSlot, GLenum format, GLenum pixelType)
 {
 	type = textureType;
 	
 	glGenTextures(1, &ID);
-	glActiveTexture(textureSlot);
+	glActiveTexture(GL_TEXTURE0 + textureSlot);
+	unit = textureSlot;
 	glBindTexture(type, ID);
 	
 	glTexParameteri(type, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -45,6 +46,7 @@ void Texture::texUnit(Shader& shader, const char* uniform, GLuint unit)
 
 void Texture::Bind()
 {
+	glActiveTexture(GL_TEXTURE0 + unit);
 	glBindTexture(type, ID);
 }
 
