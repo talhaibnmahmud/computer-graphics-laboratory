@@ -12,7 +12,7 @@ Camera::~Camera()
 {
 }
 
-void Camera::Matrix(float fov, float near, float far, Shader& shader, const char* uniform)
+void Camera::UpdateMatrix(float fov, float near, float far)
 {
 	glm::mat4 view = glm::mat4(1.0f);
 	glm::mat4 projection = glm::mat4(1.0f);
@@ -24,7 +24,12 @@ void Camera::Matrix(float fov, float near, float far, Shader& shader, const char
 	//glm::mat4 mvp = projection * view * model;
 
 	//shader.Activate();
-	glUniformMatrix4fv(glGetUniformLocation(shader.ID, uniform), 1, GL_FALSE, glm::value_ptr(projection * view));
+	CameraMatrix = projection * view;
+}
+
+void Camera::Matrix(Shader& shader, const char* uniform)
+{
+	glUniformMatrix4fv(glGetUniformLocation(shader.ID, uniform), 1, GL_FALSE, glm::value_ptr(CameraMatrix));
 }
 
 void Camera::Movement(GLFWwindow* window)

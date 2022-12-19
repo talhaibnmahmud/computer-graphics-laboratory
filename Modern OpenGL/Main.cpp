@@ -47,6 +47,32 @@ int main(int argc, char* argv[])
 		3, 0, 4,
 	};
 
+	GLfloat lightVertices[] = {
+		-0.1f, -0.1f,  0.1f,
+		-0.1f, -0.1f, -0.1f,
+		 0.1f, -0.1f, -0.1f,
+		 0.1f, -0.1f,  0.1f,
+		-0.1f,  0.1f,  0.1f,
+		-0.1f,  0.1f, -0.1f,
+		 0.1f,  0.1f, -0.1f,
+		 0.1f,  0.1f,  0.1f,
+	};
+	
+	GLuint lightIndices[] = {
+		0, 1, 2,
+		0, 2, 3,
+		0, 4, 7,
+		0, 7, 3,
+		3, 7, 6,
+		3, 6, 2,
+		2, 6, 5,
+		2, 5, 1,
+		1, 5, 4,
+		1, 4, 0,
+		4, 5, 6,
+		4, 6, 7,
+	};
+
 	GLFWwindow* window = glfwCreateWindow(width, height, "Modern OpenGL", nullptr, nullptr);
 
 	if (window == nullptr)
@@ -90,6 +116,37 @@ int main(int argc, char* argv[])
 	
 	//GLuint uniScale = glGetUniformLocation(shader.ID, "scale");
 
+	Shader lightShader("light.vert", "light.frag");
+	
+	VertexArrayObject lightVAO;
+	lightVAO.Bind();
+	
+	VertexBufferObject lightVBO(lightVertices, sizeof(lightVertices));
+	ElementBufferObject lightEBO(lightIndices, sizeof(lightIndices));
+
+	lightVAO.LinkAttrib(lightVBO, 0, 3, GL_FLOAT, 3 * sizeof(float), (void*)0);
+
+	lightVAO.Unbind();
+	lightVBO.Unbind();
+	lightEBO.Unbind();
+
+	glm::vec4 lightColor = glm::vec4(1.0f, 0.0f, 1.0f, 1.0f);
+	glm::vec3 lightPosition = glm::vec3(0.5f, 0.5f, 0.5f);
+	glm::mat4 lightModel = glm::mat4(1.0f);
+	lightModel = glm::translate(lightModel, lightPosition);
+
+	glm::vec3 pyramidPosition = glm::vec3(0.5f, 0.5f, 0.5f);
+	glm::mat4 pyramidModel = glm::mat4(1.0f);
+	pyramidModel = glm::translate(pyramidModel, pyramidPosition);
+
+	lightShader.Activate();
+	glUniformMatrix4fv(glGetUniformLocation(lightShader.ID, "model"), 1, GL_FALSE, glm::value_ptr(lightModel));
+	glUniform4f(glGetUniformLocation(lightShader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+	
+	shader.Activate();
+	glUniformMatrix4fv(glGetUniformLocation(shader.ID, "model"), 1, GL_FALSE, glm::value_ptr(pyramidModel));
+	glUniform4f(glGetUniformLocation(shader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+
 	// Texture
 	Texture texture("test.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
 	texture.texUnit(shader, "texture0", 0);
@@ -106,8 +163,6 @@ int main(int argc, char* argv[])
 	{
 		glClearColor(0.075f, 0.15f, 0.15f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		shader.Activate();
 
 		/*glm::mat4 model = glm::mat4(1.0f);
 		glm::mat4 view = glm::mat4(1.0f);
@@ -127,7 +182,11 @@ int main(int argc, char* argv[])
 		glUniform1f(uniScale, 0.5f);*/
 
 		camera.Movement(window);
-		camera.Matrix(45.0f, 0.1f, 100.0f, shader, "cameraMatrix");
+		camera.UpdateMatrix(45.0f, 0.1f, 100.0f);
+		
+		shader.Activate();
+
+		camera.Matrix(shader, "cameraMatrix");
 		
 		texture.Bind();
 		
@@ -135,6 +194,13 @@ int main(int argc, char* argv[])
 
 		glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(GLuint), GL_UNSIGNED_INT, 0);
 
+		lightShader.Activate();
+		camera.Matrix(lightShader, "cameraMatrix");
+		
+		lightVAO.Bind();
+		
+		glDrawElements(GL_TRIANGLES, sizeof(lightIndices) / sizeof(GLuint), GL_UNSIGNED_INT, 0);
+		
 		glfwSwapBuffers(window);
 
 		glfwPollEvents();
