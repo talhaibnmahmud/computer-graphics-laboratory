@@ -12,16 +12,11 @@ layout (location = 2) in vec2 aTexCoord;
 out vec3 outColor;
 out vec2 outTexCoord;
 
-// Scale Control
-uniform float scale;
-
-uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
+uniform mat4 cameraMatrix;
 
 void main()
 {
-	gl_Position = projection * view * model * vec4(aPos, 1.0f);
+	gl_Position = cameraMatrix * vec4(aPos, 1.0f);
 	outColor = aColor;
 	outTexCoord = aTexCoord;
 }

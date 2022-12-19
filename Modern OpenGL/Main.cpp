@@ -9,6 +9,7 @@
 
 #include <iostream>
 
+#include "Camera.h"
 #include "Shader.h"
 #include "Texture.h"
 #include "VertexArrayObject.h"
@@ -87,7 +88,7 @@ int main(int argc, char* argv[])
 	vbo.Unbind();
 	ebo.Unbind();
 	
-	GLuint uniScale = glGetUniformLocation(shader.ID, "scale");
+	//GLuint uniScale = glGetUniformLocation(shader.ID, "scale");
 
 	// Texture
 	Texture texture("test.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
@@ -97,10 +98,9 @@ int main(int argc, char* argv[])
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glfwSwapBuffers(window);
 
-	float rotation = 0.0f;
-	double previousTime = glfwGetTime();
-
 	glEnable(GL_DEPTH_TEST);
+
+	Camera camera(width, height, glm::vec3(0.0f, 0.0f, 2.0f));
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -109,14 +109,7 @@ int main(int argc, char* argv[])
 
 		shader.Activate();
 
-		double currentTime = glfwGetTime();
-		if (currentTime - previousTime >= 1 / 60)
-		{
-			rotation += 0.05f;
-			previousTime = currentTime;
-		}
-
-		glm::mat4 model = glm::mat4(1.0f);
+		/*glm::mat4 model = glm::mat4(1.0f);
 		glm::mat4 view = glm::mat4(1.0f);
 		glm::mat4 proj = glm::mat4(1.0f);
 		
@@ -131,7 +124,11 @@ int main(int argc, char* argv[])
 		int uniProj = glGetUniformLocation(shader.ID, "projection");
 		glUniformMatrix4fv(uniProj, 1, GL_FALSE, glm::value_ptr(proj));
 		
-		glUniform1f(uniScale, 0.5f);
+		glUniform1f(uniScale, 0.5f);*/
+
+		camera.Movement(window);
+		camera.Matrix(45.0f, 0.1f, 100.0f, shader, "cameraMatrix");
+		
 		texture.Bind();
 		
 		vao.Bind();
