@@ -13,8 +13,8 @@
 #include "Model.h"
 
 
-constexpr auto width = 800;
-constexpr auto height = 800;
+constexpr auto width = 1080;
+constexpr auto height = 1080;
 
 
 
@@ -75,7 +75,7 @@ int main(int argc, char* argv[])
 	Camera camera(width, height, glm::vec3(0.0f, 0.0f, 2.0f));
 
 	// Load in a model
-	Model model("model/sword/scene.gltf");
+	Model model("model/bunny/scene.gltf");
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -83,7 +83,7 @@ int main(int argc, char* argv[])
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		camera.Movement(window);
-		camera.UpdateMatrix(45.0f, 0.1f, 100.0f);
+		camera.UpdateMatrix(45.0f, 0.1f, 500.0f);
 
 		// Draw a model
 		model.Draw(shader, camera);

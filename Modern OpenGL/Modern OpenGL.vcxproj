@@ -166,6 +166,8 @@
     <None Include="light.vert" />
     <None Include="model\bunny\scene.bin" />
     <None Include="model\bunny\scene.gltf" />
+    <None Include="model\scroll\scene.bin" />
+    <None Include="model\scroll\scene.gltf" />
     <None Include="model\sword\scene.bin" />
     <None Include="model\sword\scene.gltf" />
   </ItemGroup>
@@ -182,6 +184,7 @@
   <ItemGroup>
     <Image Include="model\bunny\baseColor.png" />
     <Image Include="model\bunny\metallicRoughness.png" />
+    <Image Include="model\scroll\textures\lambert4SG_baseColor.png" />
     <Image Include="model\sword\textures\Object001_mtl_baseColor.jpeg" />
     <Image Include="test.png" />
   </ItemGroup>
