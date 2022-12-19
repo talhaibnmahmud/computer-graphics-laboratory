@@ -1,7 +1,7 @@
 #include "Texture.h"
 
 
-Texture::Texture(const char* image, const char* textureType, GLuint textureSlot, GLenum format, GLenum pixelType)
+Texture::Texture(const char* image, const char* textureType, GLuint textureSlot)
 {
 	type = textureType;
 	
@@ -20,15 +20,51 @@ Texture::Texture(const char* image, const char* textureType, GLuint textureSlot,
 	int width, height, nrChannels;
 	unsigned char* data = stbi_load(image, &width, &height, &nrChannels, 0);
 	
-	if (data)
-	{
-		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, pixelType, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
+	// Check what type of color channels the texture has and load it accordingly
+	if (nrChannels == 4)
+		glTexImage2D
+		(
+			GL_TEXTURE_2D,
+			0,
+			GL_RGBA,
+			width,
+			height,
+			0,
+			GL_RGBA,
+			GL_UNSIGNED_BYTE,
+			data
+		);
+	else if (nrChannels == 3)
+		glTexImage2D
+		(
+			GL_TEXTURE_2D,
+			0,
+			GL_RGBA,
+			width,
+			height,
+			0,
+			GL_RGB,
+			GL_UNSIGNED_BYTE,
+			data
+		);
+	else if (nrChannels == 1)
+		glTexImage2D
+		(
+			GL_TEXTURE_2D,
+			0,
+			GL_RGBA,
+			width,
+			height,
+			0,
+			GL_RED,
+			GL_UNSIGNED_BYTE,
+			data
+		);
 	else
-	{
-		std::cout << "Failed to load texture" << std::endl;
-	}
+		throw std::invalid_argument("Automatic Texture type recognition failed");
+	
+	// Generates MipMaps
+	glGenerateMipmap(GL_TEXTURE_2D);
 	
 	stbi_image_free(data);
 	glBindTexture(GL_TEXTURE_2D, 0);
