@@ -69,6 +69,10 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="model\bunny\scene.gltf" />
+    <None Include="model\sword\scene.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="model\sword\scene.gltf" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h">
@@ -104,6 +108,9 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="model\bunny\metallicRoughness.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="model\sword\textures\Object001_mtl_baseColor.jpeg">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

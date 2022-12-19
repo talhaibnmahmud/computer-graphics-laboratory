@@ -75,7 +75,7 @@ int main(int argc, char* argv[])
 	Camera camera(width, height, glm::vec3(0.0f, 0.0f, 2.0f));
 
 	// Load in a model
-	Model model("model/bunny/scene.gltf");
+	Model model("model/sword/scene.gltf");
 
 	while (!glfwWindowShouldClose(window))
 	{
