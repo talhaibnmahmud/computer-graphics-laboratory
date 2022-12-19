@@ -31,20 +31,35 @@ int main(int argc, char* argv[])
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	GLfloat vertices[] = {
-		-0.5f,	 0.0f,	 0.5f,		0.85f,	0.70f,	0.45f,		0.0f, 0.0f,		// lower left
-		-0.5f,	 0.0f,	-0.5f,		0.85f,	0.70f,	0.45f,		5.0f, 0.0f,		// upper left
-		 0.5f,	 0.0f,	-0.5f,		0.85f,	0.70f,	0.45f,		0.0f, 0.0f,		// top right
-		 0.5f,	 0.0f,	 0.5f,		0.85f,	0.70f,	0.45f,		5.0f, 0.0f,		// lower right
-		 0.0f,	 0.8f,	 0.0f,		0.95f,	0.85f,	0.75f,		2.5f, 5.0f,		// lower right
+		-0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f, 	 0.0f, 0.0f,      0.0f, -1.0f, 0.0f, // Bottom side
+		-0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 0.0f, 5.0f,      0.0f, -1.0f, 0.0f, // Bottom side
+		 0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 5.0f,      0.0f, -1.0f, 0.0f, // Bottom side
+		 0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,      0.0f, -1.0f, 0.0f, // Bottom side
+
+		-0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f, 	 0.0f, 0.0f,     -0.8f, 0.5f,  0.0f, // Left Side
+		-0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,     -0.8f, 0.5f,  0.0f, // Left Side
+		 0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	 2.5f, 5.0f,     -0.8f, 0.5f,  0.0f, // Left Side
+
+		-0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,      0.0f, 0.5f, -0.8f, // Non-facing side
+		 0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 0.0f, 0.0f,      0.0f, 0.5f, -0.8f, // Non-facing side
+		 0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	 2.5f, 5.0f,      0.0f, 0.5f, -0.8f, // Non-facing side
+
+		 0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 0.0f, 0.0f,      0.8f, 0.5f,  0.0f, // Right side
+		 0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,      0.8f, 0.5f,  0.0f, // Right side
+		 0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	 2.5f, 5.0f,      0.8f, 0.5f,  0.0f, // Right side
+
+		 0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	 5.0f, 0.0f,      0.0f, 0.5f,  0.8f, // Facing side
+		-0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f, 	 0.0f, 0.0f,      0.0f, 0.5f,  0.8f, // Facing side
+		 0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	 2.5f, 5.0f,      0.0f, 0.5f,  0.8f  // Facing side
 	};
 
 	GLuint indices[] = {
-		0, 1, 2,
-		0, 2, 3,
-		0, 1, 4,
-		1, 2, 4,
-		2, 3, 4,
-		3, 0, 4,
+		0,	1,	2,	// Bottom side
+		0,	2,	3,	// Bottom side
+		4,	6,	5,	// Left side
+		7,	9,	8,	// Non-facing side
+		10, 12, 11, // Right side
+		13, 15, 14	// Facing side
 	};
 
 	GLfloat lightVertices[] = {
@@ -106,9 +121,10 @@ int main(int argc, char* argv[])
 	VertexBufferObject vbo(vertices, sizeof(vertices));
 	ElementBufferObject ebo(indices, sizeof(indices));
 	
-	vao.LinkAttrib(vbo, 0, 3, GL_FLOAT, 8 * sizeof(GLfloat), (void*)0);
-	vao.LinkAttrib(vbo, 1, 3, GL_FLOAT, 8 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
-	vao.LinkAttrib(vbo, 2, 2, GL_FLOAT, 8 * sizeof(GLfloat), (void*)(6 * sizeof(GLfloat)));
+	vao.LinkAttrib(vbo, 0, 3, GL_FLOAT, 11 * sizeof(GLfloat), (void*)0);
+	vao.LinkAttrib(vbo, 1, 3, GL_FLOAT, 11 * sizeof(GLfloat), (void*)(3 * sizeof(GLfloat)));
+	vao.LinkAttrib(vbo, 2, 2, GL_FLOAT, 11 * sizeof(GLfloat), (void*)(6 * sizeof(GLfloat)));
+	vao.LinkAttrib(vbo, 3, 3, GL_FLOAT, 11 * sizeof(GLfloat), (void*)(6 * sizeof(GLfloat)));
 	
 	vao.Unbind();
 	vbo.Unbind();
@@ -130,12 +146,12 @@ int main(int argc, char* argv[])
 	lightVBO.Unbind();
 	lightEBO.Unbind();
 
-	glm::vec4 lightColor = glm::vec4(1.0f, 0.0f, 1.0f, 1.0f);
+	glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	glm::vec3 lightPosition = glm::vec3(0.5f, 0.5f, 0.5f);
 	glm::mat4 lightModel = glm::mat4(1.0f);
 	lightModel = glm::translate(lightModel, lightPosition);
 
-	glm::vec3 pyramidPosition = glm::vec3(0.5f, 0.5f, 0.5f);
+	glm::vec3 pyramidPosition = glm::vec3(0.0f, 0.0f, 0.0f);
 	glm::mat4 pyramidModel = glm::mat4(1.0f);
 	pyramidModel = glm::translate(pyramidModel, pyramidPosition);
 
@@ -146,6 +162,7 @@ int main(int argc, char* argv[])
 	shader.Activate();
 	glUniformMatrix4fv(glGetUniformLocation(shader.ID, "model"), 1, GL_FALSE, glm::value_ptr(pyramidModel));
 	glUniform4f(glGetUniformLocation(shader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+	glUniform3f(glGetUniformLocation(shader.ID, "lightPosition"), lightPosition.x, lightPosition.y, lightPosition.z);
 
 	// Texture
 	Texture texture("test.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
@@ -186,6 +203,7 @@ int main(int argc, char* argv[])
 		
 		shader.Activate();
 
+		glUniform3f(glGetUniformLocation(shader.ID, "cameraPosition"), camera.Position.x, camera.Position.y, camera.Position.z);
 		camera.Matrix(shader, "cameraMatrix");
 		
 		texture.Bind();
@@ -193,6 +211,7 @@ int main(int argc, char* argv[])
 		vao.Bind();
 
 		glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(GLuint), GL_UNSIGNED_INT, 0);
+		
 
 		lightShader.Activate();
 		camera.Matrix(lightShader, "cameraMatrix");
@@ -211,6 +230,11 @@ int main(int argc, char* argv[])
 	ebo.Delete();
 	texture.Delete();
 	shader.Delete();
+	
+	lightVAO.Delete();
+	lightVBO.Delete();
+	lightEBO.Delete();
+	lightShader.Delete();
 
 	glfwDestroyWindow(window);
 	glfwTerminate();
